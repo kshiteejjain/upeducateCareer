@@ -1,14 +1,25 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import styles from "./Login.module.css";
-import studentHero from "@/assets/student-hero.jpg"; // You can replace or remove this import if not needed
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login attempt:", { email, password });
+
+    // On successful login, redirect to dashboard
+    if (email && password) {
+      router.push("/Dashboard");
+    }
+  };
+
+  const handleCreateAccount = () => {
+    // Redirect to registration page when "Create Account" is clicked
+    router.push("/register");
   };
 
   return (
@@ -64,7 +75,7 @@ export default function Login() {
             <span>New to Red and White?</span>
           </div>
 
-          <button className={styles.createAccountButton}>
+          <button className={styles.createAccountButton} onClick={handleCreateAccount}>
             ✨ Create Account
           </button>
 
