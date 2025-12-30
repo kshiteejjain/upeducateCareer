@@ -267,7 +267,7 @@ export default function ProjectDetails() {
                 </div>
                 <div className={styles.detailRow}>
                   <span>Status</span>
-                  <strong>{project.status || "Pending"}</strong>
+                  <strong>{project.status || "Backlog"}</strong>
                 </div>
               </div>
 

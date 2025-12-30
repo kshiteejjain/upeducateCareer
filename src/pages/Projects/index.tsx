@@ -103,6 +103,7 @@ export default function Projects() {
   );
   const [techInput, setTechInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const todayString = useMemo(() => formatDate(new Date()), []);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -148,6 +149,12 @@ export default function Projects() {
   ) => {
     const { name, value } = event.target;
     if (name === "techStack") return;
+    if (name === "startDate") {
+      const clamped =
+        value && value < todayString ? todayString : value;
+      setFormState((prev) => ({ ...prev, startDate: clamped }));
+      return;
+    }
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -190,7 +197,7 @@ export default function Projects() {
       participants: [],
       progress: 0,
       techStack: formState.techStack,
-      status: "Backlog",
+      status: "backlog",
       durationDays: duration,
       owner: ownerName,
       ownerId: sessionUser?.userId,
@@ -247,7 +254,7 @@ export default function Projects() {
       deadline: computedDeadline,
       owner: ownerName,
       ownerId: sessionUser?.userId,
-      status: "Backlog" as const,
+      status: "backlog" as const,
       source: "ai" as const,
       createdAt: new Date().toISOString(),
     };
@@ -493,6 +500,7 @@ export default function Projects() {
                     name="startDate"
                     className="form-control"
                     value={formState.startDate}
+                    min={todayString}
                     onChange={handleChange}
                   />
                   {computedDeadline ? (

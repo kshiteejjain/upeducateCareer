@@ -1,15 +1,89 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 import Layout from "@/components/Layout/Layout";
 import styles from "./Profile.module.css";
 import headerStyles from "../Projects/AddProject.module.css";
 import { getSession, type AuthUser } from "@/utils/authSession";
 
 export default function Profile() {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [sessionUser, setSessionUser] = useState<AuthUser | null>(null);
+  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [savingMobile, setSavingMobile] = useState(false);
+  const [mobileDraft, setMobileDraft] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
-    setUser(getSession());
+    const existing = getSession();
+    setSessionUser(existing);
+    if (existing?.email) {
+      void fetchProfile(existing.email);
+    }
   }, []);
+
+  const fetchProfile = async (email: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/profile?email=${encodeURIComponent(email)}`);
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(
+          (errorBody as { message?: string }).message ?? "Failed to load profile."
+        );
+      }
+      const data = (await res.json()) as { user?: Record<string, unknown> | null };
+      setProfile(data.user ?? null);
+      if (data.user && typeof (data.user as any).mobileNumber === "string") {
+        setMobileDraft((data.user as any).mobileNumber);
+      }
+    } catch (error) {
+      console.error("Profile fetch failed", error);
+      toast.error(
+        error instanceof Error ? error.message : "Could not load profile."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveMobile = async () => {
+    if (!sessionUser?.email) {
+      toast.error("You need to be logged in to update your mobile number.");
+      return;
+    }
+
+    setSavingMobile(true);
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: sessionUser.email,
+          mobileNumber: mobileDraft,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(
+          (errorBody as { message?: string }).message ??
+            "Failed to update mobile number."
+        );
+      }
+
+      const data = (await res.json()) as { user?: Record<string, unknown> | null };
+      setProfile(data.user ?? profile);
+      toast.success("Mobile number updated.");
+    } catch (error) {
+      console.error("Failed to update mobile", error);
+      toast.error(
+        error instanceof Error ? error.message : "Could not update mobile."
+      );
+    } finally {
+      setSavingMobile(false);
+    }
+  };
 
   const formatValue = (value: unknown) => {
     if (!value) return "Not available";
@@ -47,21 +121,33 @@ export default function Profile() {
           </div>
         </section>
 
-        {user ? (
+        {sessionUser ? (
           <section className={styles.grid}>
             <div className={`${styles.card} ${styles.glow}`}>
-              <div className={styles.badge}>{user.name?.[0] ?? "U"}</div>
-              <h3 className={styles.cardTitle}>{user.name || "User"}</h3>
-              <p className={styles.cardMeta}>{user.email}</p>
-              <p className={styles.role}>{user.role || "Member"}</p>
+              <div className={styles.badge}>
+                {(profile as any)?.name?.[0] ?? sessionUser.name?.[0] ?? "U"}
+              </div>
+              <h3 className={styles.cardTitle}>
+                {(profile as any)?.name || sessionUser.name || "User"}
+              </h3>
+              <p className={styles.cardMeta}>
+                {(profile as any)?.email || sessionUser.email}
+              </p>
+              <p className={styles.role}>
+                {(profile as any)?.role || sessionUser.role || "Member"}
+              </p>
             </div>
 
             <div className={styles.card}>
               <h4 className={styles.label}>User ID</h4>
-              <p className={styles.value}>{user.userId ?? "Not available"}</p>
+              <p className={styles.value}>
+                {(profile as any)?.userId ?? sessionUser.userId ?? "Not available"}
+              </p>
               <div className={styles.divider} />
               <h4 className={styles.label}>Role</h4>
-              <p className={styles.value}>{user.role ?? "Member"}</p>
+              <p className={styles.value}>
+                {(profile as any)?.role ?? sessionUser.role ?? "Member"}
+              </p>
             </div>
 
             <div className={styles.card}>
@@ -70,39 +156,55 @@ export default function Profile() {
                 <li className={styles.infoRow}>
                   <span className={styles.infoLabel}>Mobile Number</span>
                   <span className={styles.infoValue}>
-                    {formatValue((user as any)?.mobileNumber)}
+                    <div className={styles.editGroup}>
+                      <input
+                        className={styles.editInput}
+                        value={mobileDraft}
+                        onChange={(e) => setMobileDraft(e.target.value)}
+                        placeholder="Enter mobile number"
+                        disabled={loading || savingMobile}
+                      />
+                      <button
+                        className={styles.editButton}
+                        onClick={handleSaveMobile}
+                        disabled={savingMobile || loading}
+                      >
+                        {savingMobile ? "Saving..." : "Save"}
+                      </button>
+                    </div>
                   </span>
                 </li>
                 <li className={styles.infoRow}>
                   <span className={styles.infoLabel}>Profile Created</span>
                   <span className={styles.infoValue}>
                     {formatValue(
-                      (user as any)?.profileCreatedAt || (user as any)?.createdAt
+                      (profile as any)?.profileCreatedAt ||
+                        (profile as any)?.createdAt
                     )}
                   </span>
                 </li>
                 <li className={styles.infoRow}>
                   <span className={styles.infoLabel}>Subject</span>
                   <span className={styles.infoValue}>
-                    {formatValue((user as any)?.subject)}
+                    {formatValue((profile as any)?.subject)}
                   </span>
                 </li>
                 <li className={styles.infoRow}>
                   <span className={styles.infoLabel}>Course Name</span>
                   <span className={styles.infoValue}>
-                    {formatValue((user as any)?.courseName)}
+                    {formatValue((profile as any)?.courseName)}
                   </span>
                 </li>
                 <li className={styles.infoRow}>
                   <span className={styles.infoLabel}>Course Duration</span>
                   <span className={styles.infoValue}>
-                    {formatValue((user as any)?.courseDuration)}
+                    {formatValue((profile as any)?.courseDuration)}
                   </span>
                 </li>
                 <li className={styles.infoRow}>
                   <span className={styles.infoLabel}>Course Start Date</span>
                   <span className={styles.infoValue}>
-                    {formatValue((user as any)?.courseStartDate)}
+                    {formatValue((profile as any)?.courseStartDate)}
                   </span>
                 </li>
               </ul>

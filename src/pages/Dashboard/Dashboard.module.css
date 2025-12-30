@@ -115,6 +115,14 @@
   background: #8b5cf6;
 }
 
+.ai {
+  background: #0ea5e9;
+}
+
+.defaultBadge {
+  background: #6b7280;
+}
+
 /* Status Pills */
 .status {
   padding: 4px 10px;

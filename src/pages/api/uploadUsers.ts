@@ -1,16 +1,46 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { randomUUID } from "crypto";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getDb } from "@/utils/firebase";
 
 type IncomingUser = {
+  userId?: string;
   name?: string;
   email?: string;
-  role?: string;
-  mobile?: string;
+  password?: string;
+  mobileNumber?: string;
   courseName?: string;
   courseDuration?: string;
   courseStartDate?: string;
-  subject?: string;
+  createdAt?: string;
+};
+
+const formatTimestampIST = () => {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  })
+    .formatToParts(now)
+    .reduce((acc, part) => {
+      acc[part.type] = part.value;
+      return acc;
+    }, {} as Record<string, string>);
+
+  const day = String(Number(parts.day ?? "0"));
+  const month = parts.month ?? "";
+  const year = parts.year ?? "";
+  const hour = parts.hour ?? "00";
+  const minute = parts.minute ?? "00";
+  const second = parts.second ?? "00";
+
+  return `${day} ${month} ${year} at ${hour}:${minute}:${second} UTC+5:30`;
 };
 
 export default async function handler(
@@ -45,15 +75,17 @@ export default async function handler(
     }
 
     const payload = {
+      userId: user.userId?.trim() || randomUUID(),
       name: user.name?.trim() || "User",
       email,
-      role: user.role?.trim() || "Member",
-      mobile: user.mobile?.trim() || "",
+      password: user.password?.trim() || "apple@123",
+      role: "student",
+      mobileNumber: user.mobileNumber?.trim() || "",
       courseName: user.courseName?.trim() || "",
       courseDuration: user.courseDuration?.trim() || "",
       courseStartDate: user.courseStartDate?.trim() || "",
-      subject: user.subject?.trim() || "",
-      createdAt: serverTimestamp(),
+      subject: "",
+      createdAt: user.createdAt?.trim() || formatTimestampIST(),
     };
 
     await setDoc(userRef, payload);

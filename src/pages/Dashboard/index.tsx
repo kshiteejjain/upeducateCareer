@@ -1,128 +1,199 @@
+import { useEffect, useMemo, useState } from "react";
 import Layout from "@/components/Layout/Layout";
 import ChartCard from "@/components/ChartCard/ChartCard";
 import Table from "@/components/Table/Table";
+import { type Project, normalizeProject } from "@/utils/projectData";
 import styles from "./Dashboard.module.css";
+
+type StatusKey = "completed" | "active" | "Backlog" | "unknown";
+
+const statusToKey = (status?: string): StatusKey => {
+  const value = status?.toLowerCase() ?? "";
+  if (value.includes("complete")) return "completed";
+  if (value.includes("active") || value.includes("progress")) return "active";
+  if (value.includes("bending") || value.includes("backlog")) return "Backlog";
+  return "unknown";
+};
 
 export default function Dashboard() {
   const headers = ["Project", "Category", "Status", "Progress"];
 
-  // Styled data for table component
-  const data = [
-  {
-    Project: "AI Resume Builder",
-    Category: <span className={`${styles.badge} ${styles.edtech}`}>EdTech</span>,
-    statusText: "Active", // ✅ hidden plain text for filter
-    Progress: (
-      <div className={styles.progressWrap}>
-        <div className={styles.progressBar}>
-          <div style={{ width: "80%" }} />
-        </div>
-        <span>80%</span>
-      </div>
-    ),
-  },
-  {
-    Project: "Chatbot App",
-    Category: <span className={`${styles.badge} ${styles.fintech}`}>Fintech</span>,
-    statusText: "Completed",
-    Progress: (
-      <div className={styles.progressWrap}>
-        <div className={styles.progressBar}>
-          <div style={{ width: "100%", background: "#22c55e" }} />
-        </div>
-        <span>100%</span>
-      </div>
-    ),
-  },
-  {
-    Project: "SmartVision",
-    Category: <span className={`${styles.badge} ${styles.social}`}>Social</span>,
-    statusText: "Pending",
-    Progress: (
-      <div className={styles.progressWrap}>
-        <div className={styles.progressBar}>
-          <div style={{ width: "60%", background: "#f97316" }} />
-        </div>
-        <span>60%</span>
-      </div>
-    ),
-  },
-  {
-    Project: "FinanceTracker",
-    Category: <span className={`${styles.badge} ${styles.fintech}`}>Fintech</span>,
-    statusText: "Active",
-    Progress: (
-      <div className={styles.progressWrap}>
-        <div className={styles.progressBar}>
-          <div style={{ width: "45%" }} />
-        </div>
-        <span>45%</span>
-      </div>
-    ),
-  },
-  {
-    Project: "HealthMonitor",
-    Category: <span className={`${styles.badge} ${styles.healthtech}`}>HealthTech</span>,
-    statusText: "Active",
-    Progress: (
-      <div className={styles.progressWrap}>
-        <div className={styles.progressBar}>
-          <div style={{ width: "70%", background: "#8b5cf6" }} />
-        </div>
-        <span>70%</span>
-      </div>
-    ),
-  },
-];
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [userCount, setUserCount] = useState<number>(0);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true);
 
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/projects`);
+        if (!response.ok) throw new Error("Failed to load projects");
+        const raw = (await response.json()) as Project[];
+        const normalized = raw.map((p) => normalizeProject(p, p.id));
+        setProjects(normalized);
+      } catch (error) {
+        console.error("Dashboard projects fetch failed", error);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
 
-  const barData = {
-    labels: ["AI", "Fintech", "EdTech", "Social", "HealthTech"],
-    datasets: [
-      {
-        label: "Active Projects",
-        data: [5, 3, 6, 2, 4],
-        backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"],
-        borderRadius: 8,
-      },
-    ],
-  };
+    const fetchUsers = async () => {
+      try {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/usersStats`);
+        if (!response.ok) throw new Error("Failed to load users");
+        const result = (await response.json()) as { count?: number };
+        setUserCount(result.count ?? 0);
+      } catch (error) {
+        console.error("Dashboard users fetch failed", error);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
 
-  const pieData = {
-    labels: ["Completed", "In Progress", "Pending"],
-    datasets: [
-      {
-        data: [10, 7, 3],
-        backgroundColor: ["#22c55e", "#facc15", "#ef4444"],
-        borderWidth: 2,
-      },
-    ],
-  };
+    void fetchProjects();
+    void fetchUsers();
+  }, []);
+
+  const completedProjects = useMemo(
+    () => projects.filter((p) => statusToKey(p.status) === "completed").length,
+    [projects]
+  );
+
+  const barData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    projects.forEach((p) => {
+      const key = p.category || "Uncategorized";
+      counts[key] = (counts[key] ?? 0) + 1;
+    });
+    const labels = Object.keys(counts);
+    const data = labels.map((l) => counts[l]);
+    return {
+      labels,
+      datasets: [
+        {
+          label: "Projects",
+          data,
+          backgroundColor: [
+            "#3b82f6",
+            "#10b981",
+            "#f59e0b",
+            "#ef4444",
+            "#8b5cf6",
+            "#14b8a6",
+            "#a855f7",
+          ],
+          borderRadius: 8,
+        },
+      ],
+    };
+  }, [projects]);
+
+  const pieData = useMemo(() => {
+    const counts: Record<StatusKey, number> = {
+      completed: 0,
+      active: 0,
+      backlog: 0,
+      unknown: 0,
+    };
+    projects.forEach((p) => {
+      counts[statusToKey(p.status)] += 1;
+    });
+
+    return {
+      labels: ["Completed", "Active", "Backlog", "Unknown"],
+      datasets: [
+        {
+          data: [
+            counts.completed,
+            counts.active,
+            counts.backlog,
+            counts.unknown,
+          ],
+          backgroundColor: ["#22c55e", "#facc15", "#ef4444", "#94a3b8"],
+          borderWidth: 2,
+        },
+      ],
+    };
+  }, [projects]);
+
+  const recentRows = useMemo(() => {
+    const badgeClass = (category?: string) => {
+      const value = category?.toLowerCase() ?? "";
+      if (value.includes("fintech")) return `${styles.badge} ${styles.fintech}`;
+      if (value.includes("health")) return `${styles.badge} ${styles.healthtech}`;
+      if (value.includes("ed")) return `${styles.badge} ${styles.edtech}`;
+      if (value.includes("ai")) return `${styles.badge} ${styles.ai}`;
+      if (value.includes("social")) return `${styles.badge} ${styles.social}`;
+      return `${styles.badge} ${styles.defaultBadge}`;
+    };
+
+    return projects
+      .slice(0, 20)
+      .map((project) => {
+        const progressValue = project.progress ?? 0;
+        const statusText = project.status ?? "backlog";
+        return {
+          Project: project.name ?? "Untitled",
+          Category: (
+            <span className={badgeClass(project.category)}>
+              {project.category || "Uncategorized"}
+            </span>
+          ),
+          statusText,
+          Progress: (
+            <div className={styles.progressWrap}>
+              <div className={styles.progressBar}>
+                <div
+                  style={{
+                    width: `${Math.min(Math.max(progressValue, 0), 100)}%`,
+                    background:
+                      progressValue >= 100
+                        ? "#22c55e"
+                        : progressValue > 60
+                        ? "#10b981"
+                        : progressValue > 30
+                        ? "#f97316"
+                        : undefined,
+                  }}
+                />
+              </div>
+              <span>{progressValue}%</span>
+            </div>
+          ),
+        };
+      });
+  }, [projects]);
 
   return (
     <Layout>
       <div className={styles.dashboard}>
-
         <div className={styles.cards}>
           <div className={styles.card}>
             <h3>Total Projects</h3>
-            <h2>24</h2>
-            <p className={styles.greenText}>+12% from last month</p>
+            <h2>{loadingProjects ? "…" : projects.length}</h2>
+            <p className={styles.greenText}>Projects in the workspace</p>
           </div>
           <div className={styles.card}>
-            <h3>Completed</h3>
-            <h2>12</h2>
-            <p className={styles.greenText}>50% completion rate</p>
+            <h3>Completed Projects</h3>
+            <h2>{loadingProjects ? "…" : completedProjects}</h2>
+            <p className={styles.greenText}>Marked as completed</p>
           </div>
           <div className={styles.card}>
             <h3>Active Members</h3>
-            <h2>48</h2>
-            <p className={styles.greenText}>+8 this week</p>
+            <h2>{loadingUsers ? "…" : userCount}</h2>
+            <p className={styles.greenText}>Total registered users</p>
           </div>
           <div className={styles.card}>
-            <h3>Pending Tasks</h3>
-            <h2>4</h2>
-            <p className={styles.redText}>2 due this week</p>
+            <h3>Backlog Projects</h3>
+            <h2>
+              {loadingProjects
+                ? "…"
+                : Math.max(projects.length - completedProjects, 0)}
+            </h2>
+            <p className={styles.redText}>Remaining to complete</p>
           </div>
         </div>
 
@@ -133,8 +204,7 @@ export default function Dashboard() {
 
         <div className={styles.tableSection}>
           <h2>Recent Projects</h2>
-          {/* ✅ Uses your existing Table component */}
-          <Table headers={headers} data={data} />
+          <Table headers={headers} data={recentRows} />
         </div>
       </div>
     </Layout>

@@ -8,7 +8,7 @@ export default function ViewJobs() {
 
   const jobs = Array.from({ length: 50 }, (_, i) => {
     const platforms = ["LinkedIn", "Indeed", "Naukri", "Glassdoor", "Internshala"];
-    const statuses = ["Active", "Pending", "Completed"];
+    const statuses = ["Active", "Backlog", "Completed"];
     return {
       "Job Title": [
         "Frontend Developer",

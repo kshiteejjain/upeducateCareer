@@ -134,7 +134,7 @@ export default async function handler(
         participants,
         progress: 0,
         techStack,
-      status: status?.trim() || "Backlog",
+      status: status?.trim() || "backlog",
         durationDays,
         owner: owner?.trim() || "Project Owner",
         ownerId: ownerId?.trim() || undefined,

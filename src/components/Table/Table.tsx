@@ -18,11 +18,16 @@ export default function Table({ headers, data }: TableProps) {
         .join(" ")
         .toLowerCase()
         .includes(search.toLowerCase());
-const matchFilter =
-  filter === "All" ||
-  (typeof row.statusText === "string" && row.statusText.toLowerCase() === filter.toLowerCase()) ||
-  (typeof row.Status === "string" && row.Status.toLowerCase() === filter.toLowerCase());
-return matchSearch && matchFilter;
+      const statusValue =
+        typeof row.statusText === "string"
+          ? row.statusText
+          : typeof row.Status === "string"
+          ? row.Status
+          : "";
+      const matchFilter =
+        filter === "All" ||
+        statusValue.toLowerCase() === filter.toLowerCase();
+      return matchSearch && matchFilter;
     });
   }, [data, search, filter]);
 
@@ -45,7 +50,7 @@ return matchSearch && matchFilter;
           <option>All</option>
           <option>Active</option>
           <option>Completed</option>
-          <option>Pending</option>
+          <option>Backlog</option>
         </select>
       </div>
 
@@ -56,8 +61,10 @@ return matchSearch && matchFilter;
         <tbody>
           {paginated.map((row, i) => (
             <tr className={styles.tr} key={i}>
-              {Object.values(row).map((cell: any, j) => (
-                <td className={styles.td} key={j}>{cell}</td>
+              {headers.map((header, j) => (
+                <td className={styles.td} key={j}>
+                  {row[header] ?? row[header.toLowerCase()] ?? ""}
+                </td>
               ))}
             </tr>
           ))}
