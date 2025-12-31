@@ -10,13 +10,11 @@ const menuItems = [
   { name: 'Projects', path: "/Projects" },
   { name: "View Jobs", path: "/ViewJobs" },
   { name: "Interview Preparation", path: "/InterviewQuestions" },
-  { name: "AI Resume Builder", path: "/comingsoon" },
+  { name: "Professional Resume", path: "/ResumeBuilder" },
   { name: "AI Mock Interview", path: "/comingsoon" },
-  { name: "AI Project Ideas", path: "/comingsoon" },
   { name: "Discussion Forum", path: "/comingsoon" },
   { name: "Mentorship", path: "/comingsoon" },
   { name: 'Resource Library', path: "/comingsoon" },
-  { name: "Leaderboard", path: "/comingsoon" },
   { name: "Upload", path: "/Upload" },
 ];
 

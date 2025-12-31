@@ -1,28 +1,69 @@
+import { useEffect, useMemo, useState } from "react";
 import Layout from "@/components/Layout/Layout";
 import Table from "@/components/Table/Table";
 import styles from "./ViewJobs.module.css";
 import headerStyles from "../Projects/AddProject.module.css";
 
-export default function ViewJobs() {
-  const headers = ["Job Title", "Date Posted", "Platform", "Status", "Action"];
+type JobRow = {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  postedAt: string;
+  platform: string;
+  status: string;
+  applyUrl: string;
+};
 
-  const jobs = Array.from({ length: 50 }, (_, i) => {
-    const platforms = ["LinkedIn", "Indeed", "Naukri", "Glassdoor", "Internshala"];
-    const statuses = ["Active", "Backlog", "Completed"];
-    return {
-      "Job Title": [
-        "Frontend Developer",
-        "AI Engineer",
-        "React Developer",
-        "UI/UX Designer",
-        "Cyber Security Analyst",
-      ][i % 5] + ` #${i + 1}`,
-      "Date Posted": `Oct ${21 - (i % 10)}`,
-      Platform: platforms[i % platforms.length],
-      Status: statuses[i % statuses.length],
-      Action: <button className="btn-primary">View</button>,
+export default function ViewJobs() {
+  const headers = ["Job Title", "Company", "Location", "Platform", "Posted", "Status", "Action"];
+  const [jobs, setJobs] = useState<JobRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/jobs`);
+        if (!response.ok) throw new Error(`Failed to load jobs (${response.status})`);
+        const result = (await response.json()) as { jobs?: JobRow[]; message?: string };
+        if (!result.jobs) throw new Error(result.message || "No jobs returned");
+        setJobs(result.jobs);
+      } catch (err) {
+        console.error("Jobs fetch failed", err);
+        setError(err instanceof Error ? err.message : "Failed to load jobs");
+      } finally {
+        setLoading(false);
+      }
     };
-  });
+
+    void fetchJobs();
+  }, []);
+
+  const tableRows = useMemo(
+    () =>
+      jobs.map((job) => ({
+        "Job Title": job.title,
+        Company: job.company,
+        Location: job.location,
+        Platform: job.platform,
+        Posted: job.postedAt || "-",
+        Status: job.status || "Open",
+        statusText: job.status || "Open",
+        Action: (
+          <a
+            href={job.applyUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-link"
+          >
+            Apply
+          </a>
+        ),
+      })),
+    [jobs]
+  );
 
   return (
     <Layout>
@@ -35,10 +76,18 @@ export default function ViewJobs() {
         </div>
       </section>
 
-      <Table headers={headers} data={jobs} />
-      <div className={styles.jobInfo}>
-        <p>Total {jobs.length} Jobs, Showing 10 jobs per page</p>
-      </div>
+      {loading ? (
+        <p className={styles.jobInfo}>Loading jobs...</p>
+      ) : error ? (
+        <p className={styles.jobInfo}>Error: {error}</p>
+        ) : (
+          <>
+          <Table headers={headers} data={tableRows} enableStatusFilter={false} />
+          <div className={styles.jobInfo}>
+            <p>Total {jobs.length} Jobs, Showing 10 jobs per page</p>
+          </div>
+          </>
+        )}
     </Layout>
   );
 }
