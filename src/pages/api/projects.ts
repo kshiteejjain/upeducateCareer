@@ -8,6 +8,9 @@ import {
   doc,
   updateDoc,
   arrayUnion,
+  arrayRemove,
+  deleteDoc,
+  deleteField,
 } from "firebase/firestore";
 import { getDb } from "@/utils/firebase";
 import { normalizeProject, type Project } from "@/utils/projectData";
@@ -27,6 +30,32 @@ type CreateProjectBody = {
   source?: Project["source"];
   status?: string;
 };
+
+type UpdateProjectBody = Partial<CreateProjectBody> & {
+  id?: string;
+  progress?: number | string;
+  participant?: string;
+  action?: "add" | "remove";
+  participantRole?: string;
+  participantContribution?: string;
+};
+
+const allowedStatuses = ["Backlog", "In Progress", "Completed"] as const;
+
+function normalizeStatus(value?: string | null): string {
+  if (!value) return "Backlog";
+  const formatted = value
+    .trim()
+    .split(" ")
+    .map(
+      (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    )
+    .join(" ")
+    .trim();
+  return allowedStatuses.includes(formatted as (typeof allowedStatuses)[number])
+    ? formatted
+    : "Backlog";
+}
 
 function serializeProject(data: Partial<Project>, id: string): Project {
   const createdAt =
@@ -115,6 +144,8 @@ export default async function handler(
     }
 
     try {
+      const normalizedStatus = normalizeStatus(status);
+
       const parsedBudget =
         typeof budget === "string"
           ? parseFloat(budget.replace(/[^\d.-]/g, ""))
@@ -132,9 +163,10 @@ export default async function handler(
         startDate,
         deadline,
         participants,
+        participantNotes: {},
         progress: 0,
         techStack,
-      status: status?.trim() || "backlog",
+        status: normalizedStatus,
         durationDays,
         owner: owner?.trim() || "Project Owner",
         ownerId: ownerId?.trim() || undefined,
@@ -163,13 +195,124 @@ export default async function handler(
   }
 
   if (req.method === "PATCH") {
-    const { participant } = req.body as { participant?: string };
-    const participantName = participant?.trim();
-
-    if (!projectId || !participantName) {
+    if (!projectId) {
       return res
         .status(400)
-        .json({ message: "id and participant name are required." });
+        .json({ message: "id is required to update a project." });
+    }
+
+    const {
+      participant,
+      action,
+      progress,
+      durationDays,
+      budget,
+      techStack,
+      participantRole,
+      participantContribution,
+      ...rest
+    } = req.body as UpdateProjectBody;
+
+    const participantName = participant?.trim();
+
+    try {
+      const projectRef = doc(projectsRef, projectId);
+      const snap = await getDoc(projectRef);
+      if (!snap.exists()) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+
+      const updates: Record<string, unknown> = {};
+
+      if (participantName) {
+        updates.participants =
+          action === "remove"
+            ? arrayRemove(participantName)
+            : arrayUnion(participantName);
+
+        if (action !== "remove") {
+          const safeRole = participantRole?.trim() || undefined;
+          const safeContribution = participantContribution?.trim() || undefined;
+          if (safeRole || safeContribution) {
+            updates[`participantNotes.${participantName}`] = {
+              role: safeRole,
+              contribution: safeContribution,
+            };
+          }
+        } else {
+          updates[`participantNotes.${participantName}`] = deleteField();
+        }
+      }
+
+      const normalizedProgress = Number(progress);
+      if (!Number.isNaN(normalizedProgress)) {
+        updates.progress = Math.min(100, Math.max(0, normalizedProgress));
+      }
+
+      const normalizedDuration = Number(durationDays);
+      if (!Number.isNaN(normalizedDuration)) {
+        updates.durationDays = Math.max(0, normalizedDuration);
+      }
+
+      if (Array.isArray(techStack)) {
+        updates.techStack = techStack
+          .map((value) => (typeof value === "string" ? value.trim() : ""))
+          .filter(Boolean);
+      }
+
+      const parsedBudget =
+        typeof budget === "string"
+          ? parseFloat(budget.replace(/[^\d.-]/g, ""))
+          : budget;
+      if (typeof parsedBudget === "number" && Number.isFinite(parsedBudget)) {
+        updates.budget = parsedBudget;
+      }
+
+      (
+        [
+          "name",
+          "category",
+          "description",
+          "startDate",
+          "deadline",
+          "owner",
+          "ownerId",
+          "status",
+          "source",
+          "participantNotes",
+        ] as const
+      ).forEach((field) => {
+        const value = rest[field];
+        if (typeof value === "string") {
+          updates[field] =
+            field === "status" ? normalizeStatus(value) : value.trim();
+        }
+      });
+
+      if (Object.keys(updates).length === 0) {
+        return res
+          .status(400)
+          .json({ message: "No valid fields were provided to update." });
+      }
+
+      await updateDoc(projectRef, updates);
+      const updatedSnap = await getDoc(projectRef);
+      return res
+        .status(200)
+        .json(serializeProject(updatedSnap.data(), updatedSnap.id));
+    } catch (error) {
+      console.error("Failed to update project", error);
+      const message =
+        error instanceof Error ? error.message : "Failed to update project";
+      return res.status(500).json({ message });
+    }
+  }
+
+  if (req.method === "DELETE") {
+    if (!projectId) {
+      return res
+        .status(400)
+        .json({ message: "id is required to delete a project." });
     }
 
     try {
@@ -179,24 +322,16 @@ export default async function handler(
         return res.status(404).json({ message: "Project not found" });
       }
 
-      await updateDoc(projectRef, {
-        participants: arrayUnion(participantName),
-      });
-
-      const updatedSnap = await getDoc(projectRef);
-      return res
-        .status(200)
-        .json(serializeProject(updatedSnap.data(), updatedSnap.id));
+      await deleteDoc(projectRef);
+      return res.status(200).json({ message: "Project deleted" });
     } catch (error) {
-      console.error("Failed to update participants", error);
+      console.error("Failed to delete project", error);
       const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to update participants";
+        error instanceof Error ? error.message : "Failed to delete project";
       return res.status(500).json({ message });
     }
   }
 
-  res.setHeader("Allow", "GET, POST, PATCH");
+  res.setHeader("Allow", "GET, POST, PATCH, DELETE");
   return res.status(405).json({ message: "Method Not Allowed" });
 }

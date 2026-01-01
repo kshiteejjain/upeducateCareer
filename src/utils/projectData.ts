@@ -6,6 +6,10 @@ export type Project = {
   startDate: string;
   deadline: string;
   participants: string[];
+  participantNotes?: Record<
+    string,
+    { role?: string; contribution?: string }
+  >;
   progress: number;
   techStack: string[];
   status: string;
@@ -76,6 +80,7 @@ export const normalizeProject = (
   startDate: data.startDate ?? "",
   deadline: data.deadline ?? "",
   participants: data.participants ?? [],
+  participantNotes: data.participantNotes ?? {},
   progress: data.progress ?? 0,
   techStack: data.techStack ?? [],
   status: data.status ?? "",

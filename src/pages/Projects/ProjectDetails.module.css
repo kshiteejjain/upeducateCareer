@@ -200,6 +200,11 @@
   color: var(--color-1c8c4a);
 }
 
+.statusCompleted {
+  background: var(--color-e9f8f0);
+  color: var(--color-1c8c4a);
+}
+
 .progressWrap {
   display: flex;
   flex-direction: column;
@@ -323,6 +328,234 @@
   box-shadow: 0 10px 18px var(--color-rgba-90-54-214-016);
 }
 
+.dangerButton {
+  background: var(--color-ffe5e1);
+  color: var(--color-8f0500);
+  border: 1px solid var(--color-ffc4b8);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dangerButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dangerButton:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(143, 5, 0, 0.12);
+}
+
+.badge {
+  background: var(--color-f1ecff);
+  color: var(--color-5a36d6);
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border: 1px solid var(--color-e3d9ff);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  color: var(--color-6a6a7a);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--color-e3d9ff);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--color-1f1f2f);
+  background: var(--color-ffffff);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.select {
+  appearance: none;
+}
+
+.helperNote {
+  font-size: 12px;
+  color: var(--color-6a6a7a);
+  margin-top: 4px;
+}
+
+.editGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.techInputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.techPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.techPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-f1ecff);
+  border: 1px solid var(--color-e3d9ff);
+  color: var(--color-5a36d6);
+  border-radius: 14px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pillRemove {
+  background: transparent;
+  border: none;
+  color: var(--color-6a6a7a);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.teamCard {
+  grid-column: span 2;
+}
+
+.teamLayout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.teamPanel,
+.contributorsPanel {
+  background: var(--color-f9f8ff);
+  border: 1px solid var(--color-e3d9ff);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.panelLabel {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: var(--color-4b4b57);
+  text-transform: uppercase;
+}
+
+.noteList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.noteRow {
+  border: 1px solid var(--color-e3d9ff);
+  background: var(--color-f9f8ff);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.noteAuthor {
+  font-weight: 800;
+  color: var(--color-1f1f2f);
+  margin: 0 0 4px;
+}
+
+.noteRole {
+  margin: 0;
+  color: var(--color-6a6a7a);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.noteText {
+  margin: 0;
+  color: var(--color-333344);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.noteActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.teamRemove {
+  background: var(--color-fae1dd);
+  color: var(--color-8f0500);
+  border: 1px solid var(--color-ffc4b8);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.teamRemove:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.teamRemove:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(143, 5, 0, 0.08);
+}
+
+.noticeBox {
+  border: 1px dashed var(--color-ffc4b8);
+  background: var(--color-fff5f3);
+  color: var(--color-8f0500);
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .emptyState {
   padding: 40px 24px;
   text-align: center;
@@ -354,6 +587,14 @@
 
 @media (max-width: 1080px) {
   .heroArea {
+    grid-template-columns: 1fr;
+  }
+
+  .teamCard {
+    grid-column: span 1;
+  }
+
+  .teamLayout {
     grid-template-columns: 1fr;
   }
 }

@@ -86,6 +86,16 @@ const normalizeDate = (value: string, fallback: Date) =>
 
 const formatDate = (value: Date) => value.toISOString().slice(0, 10);
 
+const formatDateDisplay = (value: string | undefined | null) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear());
+  return `${day}-${month}-${year}`;
+};
+
 const computeDeadlineFromDuration = (
   startDate: string,
   durationDays: number
@@ -410,11 +420,11 @@ export default function Projects() {
                   <div className={styles.cardMeta}>
                     <div>
                       <span>🗓️ Start</span>
-                      <strong>{project.startDate}</strong>
+                      <strong>{formatDateDisplay(project.startDate)}</strong>
                     </div>
                     <div>
                       <span>🗓️ Deadline</span>
-                      <strong>{project.deadline}</strong>
+                      <strong>{formatDateDisplay(project.deadline)}</strong>
                     </div>
                     <div className={styles.participantsMeta}>
                       <div className={styles.participantsLabel}>
@@ -654,5 +664,6 @@ export default function Projects() {
     </Layout>
   );
 }
+
 
 

@@ -158,6 +158,11 @@
   color: var(--color-225e31);
 }
 
+.statusCompleted {
+  background: var(--color-e3f4dd);
+  color: var(--color-225e31);
+}
+
 .cardDescription {
   color: var(--color-64748b);
   font-size: 14px;
