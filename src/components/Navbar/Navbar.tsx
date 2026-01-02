@@ -5,14 +5,21 @@ import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const { pathname, push } = useRouter(); // Destructure pathname directly from router
-  const [pageTitle, setPageTitle] = useState("Dashboard"); // Default title
+  const { pathname, push } = useRouter();
+  const [pageTitle, setPageTitle] = useState("Dashboard");
 
   useEffect(() => {
-    // Get the last part of the pathname and format it as a title
-    const title = pathname.split("/").pop()?.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase()) || "Dashboard";
-    setPageTitle(title); // Set the page title
-  }, [pathname]); // Only re-run when the pathname changes
+    const segment = pathname.split("/").filter(Boolean).pop() || "";
+    if (pathname === "/Projects/[id]") {
+      setPageTitle("Project Details");
+      return;
+    }
+    const title =
+      segment
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) => str.toUpperCase()) || "Dashboard";
+    setPageTitle(title);
+  }, [pathname]);
 
   const goToProfile = () => {
     setOpen(false);

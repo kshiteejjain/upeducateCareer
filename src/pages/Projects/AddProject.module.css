@@ -400,10 +400,12 @@
   padding: 10px 18px;
   font-weight: 500;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .submitButton:hover {
-  background: var(--color-b30600);
+  box-shadow: 0 0 26px rgba(0 0 0 / 0.4);
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .helperText {
