@@ -2,7 +2,7 @@
   --background: var(--color-fafafa);
   --foreground: var(--color-white);
 
-  --text-primary: var(--color-000);
+  --text-primary: var(--color-black);
   --text-secondary: var(--color-666);
 
   --button-primary-hover: var(--color-383838);
@@ -128,8 +128,8 @@ a.secondary {
   }
 
   .page {
-    --background: var(--color-000);
-    --foreground: var(--color-000);
+    --background: var(--color-black);
+    --foreground: var(--color-black);
 
     --text-primary: var(--color-ededed);
     --text-secondary: var(--color-999);

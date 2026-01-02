@@ -131,7 +131,7 @@
   border-radius: 20px;
   padding: 18px;
   border: 1px solid var(--color-efe5ff);
-  box-shadow: 0 0 20px var(--color-0000003b);
+  box-shadow: 0 0 20px var(--color-black0003b);
   display: flex;
   flex-direction: column;
   gap: 14px;

@@ -108,7 +108,7 @@
 .cardTitle {
   font-size: 18px;
   font-weight: 500;
-  color: var(--color-000);
+  color: var(--color-black);
   margin-top: 6px;
   text-transform: capitalize;
 }
@@ -249,7 +249,7 @@
 .viewButton {
   border: none;
   background: var(--color-primary);
-  color: var(--color-000);
+  color: var(--color-black);
   padding: 12px 14px;
   border-radius: 8px;
   font-size: 14px;
