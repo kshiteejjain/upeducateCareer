@@ -19,7 +19,7 @@
 
 .title {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 500;
   color: var(--color-1f1f2f);
   margin: 0 0 6px;
 }
@@ -39,16 +39,16 @@
 .primary,
 .secondary {
   border: none;
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 10px 16px;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .primary {
   background: linear-gradient(135deg, var(--color-7b4bff), var(--color-ff6fba));
-  color: var(--color-ffffff);
+  color: var(--color-whitefff);
   box-shadow: 0 10px 24px var(--color-rgba-123-75-255-025);
 }
 
@@ -75,7 +75,7 @@
 }
 
 .card {
-  background: var(--color-ffffff);
+  background: var(--color-whitefff);
   border-radius: 16px;
   padding: 18px;
   border: 1px solid var(--color-efe5ff);
@@ -101,11 +101,11 @@
   height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-7b4bff), var(--color-ff6fba));
-  color: var(--color-fff);
+  color: var(--color-white);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
+  font-weight: 500;
   box-shadow: 0 8px 18px var(--color-rgba-123-75-255-03);
 }
 
@@ -124,7 +124,7 @@
 
 .role {
   color: var(--color-5a36d6);
-  font-weight: 700;
+  font-weight: 500;
   font-size: 13px;
 }
 
@@ -136,7 +136,7 @@
 
 .value {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-1f1f2f);
   margin: 4px 0 0;
 }
@@ -172,7 +172,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 5px;
   background: var(--color-f7f5ff);
   border: 1px solid var(--color-ece6ff);
 }
@@ -184,7 +184,7 @@
 
 .infoValue {
   color: var(--color-1f1f2f);
-  font-weight: 700;
+  font-weight: 500;
   font-size: 13px;
 }
 
@@ -204,12 +204,12 @@
 
 .editButton {
   background: linear-gradient(135deg, var(--color-7b4bff), var(--color-ff6fba));
-  color: var(--color-fff);
+  color: var(--color-white);
   border: none;
   border-radius: 8px;
   padding: 8px 12px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 500;
   box-shadow: 0 8px 18px var(--color-rgba-123-75-255-025);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -227,7 +227,7 @@
 }
 
 .empty {
-  background: var(--color-fff);
+  background: var(--color-white);
   border: 1px dashed var(--color-e6ddff);
   border-radius: 16px;
   padding: 24px;

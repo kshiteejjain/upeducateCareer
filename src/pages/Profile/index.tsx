@@ -5,25 +5,16 @@ import Layout from "@/components/Layout/Layout";
 import styles from "./Profile.module.css";
 import headerStyles from "../Projects/AddProject.module.css";
 import { getSession, type AuthUser } from "@/utils/authSession";
+import { useLoader } from "@/components/Loader/LoaderProvider";
 
 export default function Profile() {
   const [sessionUser, setSessionUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [savingMobile, setSavingMobile] = useState(false);
   const [mobileDraft, setMobileDraft] = useState("");
   const router = useRouter();
-
-  useEffect(() => {
-    const existing = getSession();
-    setSessionUser(existing);
-    if (existing?.email) {
-      void fetchProfile(existing.email);
-    }
-  }, []);
+  const { withLoader, isLoading } = useLoader();
 
   const fetchProfile = async (email: string) => {
-    setLoading(true);
     try {
       const res = await fetch(`/api/profile?email=${encodeURIComponent(email)}`);
       if (!res.ok) {
@@ -42,10 +33,19 @@ export default function Profile() {
       toast.error(
         error instanceof Error ? error.message : "Could not load profile."
       );
-    } finally {
-      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const existing = getSession();
+    setSessionUser(existing);
+    if (existing?.email) {
+      void withLoader(
+        () => fetchProfile(existing.email),
+        "Loading your profile data..."
+      );
+    }
+  }, [withLoader]);
 
   const handleSaveMobile = async () => {
     if (!sessionUser?.email) {
@@ -53,35 +53,34 @@ export default function Profile() {
       return;
     }
 
-    setSavingMobile(true);
     try {
-      const res = await fetch("/api/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: sessionUser.email,
-          mobileNumber: mobileDraft,
-        }),
-      });
+      await withLoader(async () => {
+        const res = await fetch("/api/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: sessionUser.email,
+            mobileNumber: mobileDraft,
+          }),
+        });
 
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw new Error(
-          (errorBody as { message?: string }).message ??
-            "Failed to update mobile number."
-        );
-      }
+        if (!res.ok) {
+          const errorBody = await res.json().catch(() => ({}));
+          throw new Error(
+            (errorBody as { message?: string }).message ??
+              "Failed to update mobile number."
+          );
+        }
 
-      const data = (await res.json()) as { user?: Record<string, unknown> | null };
-      setProfile(data.user ?? profile);
-      toast.success("Mobile number updated.");
+        const data = (await res.json()) as { user?: Record<string, unknown> | null };
+        setProfile(data.user ?? profile);
+        toast.success("Mobile number updated.");
+      }, "Updating your profile...");
     } catch (error) {
       console.error("Failed to update mobile", error);
       toast.error(
         error instanceof Error ? error.message : "Could not update mobile."
       );
-    } finally {
-      setSavingMobile(false);
     }
   };
 
@@ -162,14 +161,14 @@ export default function Profile() {
                         value={mobileDraft}
                         onChange={(e) => setMobileDraft(e.target.value)}
                         placeholder="Enter mobile number"
-                        disabled={loading || savingMobile}
+                        disabled={isLoading}
                       />
                       <button
                         className={styles.editButton}
                         onClick={handleSaveMobile}
-                        disabled={savingMobile || loading}
+                        disabled={isLoading}
                       >
-                        {savingMobile ? "Saving..." : "Save"}
+                        {isLoading ? "Saving..." : "Save"}
                       </button>
                     </div>
                   </span>

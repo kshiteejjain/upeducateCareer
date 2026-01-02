@@ -3,7 +3,6 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  background: linear-gradient(180deg, var(--color-f8f7ff) 0%, var(--color-ffffff) 100%);
   min-height: 100vh;
 }
 
@@ -17,7 +16,7 @@
 
 .backLink {
   color: var(--color-7a3fe1);
-  font-weight: 700;
+  font-weight: 500;
   text-decoration: none;
 }
 
@@ -28,7 +27,7 @@
 }
 
 .heroCard {
-  background: var(--color-ffffff);
+  background: var(--color-whitefff);
   border-radius: 20px;
   padding: 22px 24px;
   border: 1px solid var(--color-efe5ff);
@@ -48,20 +47,20 @@
   padding: 7px 12px;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.2px;
   display: inline-flex;
   align-items: center;
 }
 
 .tagPrimary {
-  background: var(--color-f1ecff);
-  color: var(--color-5a36d6);
+  background: var(--color-lightGray);
+  color: var(--color-blue);
 }
 
 .tagNeutral {
-  background: var(--color-eef6ff);
-  color: var(--color-1f74d3);
+  background: var(--color-lightGray);
+  color: var(--color-blue);
 }
 .heroHeader {
   display: flex;
@@ -72,15 +71,15 @@
 
 .heroTitle {
   font-size: 30px;
-  font-weight: 800;
-  color: var(--color-1f1f2f);
+  font-weight: 500;
+  color: var(--color-textGray);
   margin-bottom: 6px;
 }
 
 .heroSubtitle {
   font-size: 14px;
-  color: var(--color-4b4b57);
-  line-height: 1.6;
+  color: var(--color-textGray);
+  line-height: 30px;
   max-width: 880px;
 }
 .heroMeta {
@@ -90,15 +89,14 @@
 }
 
 .metric {
-  background: var(--color-f8f7ff);
-  border-radius: 12px;
+  background: var(--color-lightGray);
+  border-radius: 5px;
   padding: 12px 14px;
-  border: 1px solid var(--color-ece8ff);
 }
 
 .metric span {
-  font-size: 11px;
-  color: var(--color-6a6a7a);
+  font-size: 13px;
+  color: var(--color-textGray);
   letter-spacing: 0.1px;
 }
 
@@ -106,7 +104,8 @@
   display: block;
   margin-top: 6px;
   font-size: 14px;
-  color: var(--color-1f1f2f);
+  color: var(--color-textGray);
+  font-weight: 600;
 }
 
 .participantMetric {
@@ -128,7 +127,7 @@
 }
 
 .statusCard {
-  background: var(--color-ffffff);
+  background: var(--color-whitefff);
   border-radius: 20px;
   padding: 18px;
   border: 1px solid var(--color-efe5ff);
@@ -147,7 +146,7 @@
 .statusLabel {
   font-size: 13px;
   color: var(--color-4b4b57);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .statusBadgeRow {
@@ -162,7 +161,7 @@
   border-radius: 999px;
   background: var(--color-e9e3ff);
   color: var(--color-5a36d6);
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
 }
 
@@ -172,7 +171,7 @@
   border-radius: 999px;
   background: var(--color-f3f3f6);
   color: var(--color-6a6a7a);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .statusPlanning {
@@ -181,28 +180,28 @@
 }
 
 .statusInProgress {
-  background: var(--color-e9f3ff);
-  color: var(--color-1f74d3);
+  background: var(--color-lightGray);
+  color: var(--color-textGray);
 }
 
 .statusReview {
-  background: var(--color-fff4e6);
-  color: var(--color-cf711f);
+  background: var(--color-lightGray);
+  color: var(--color-textGray);
 }
 
 .statusBacklog {
-  background: var(--color-fff1db);
-  color: var(--color-a86a00);
+  background: var(--color-lightGray);
+  color: var(--color-textGray);
 }
 
 .statusComplete {
-  background: var(--color-e9f8f0);
-  color: var(--color-1c8c4a);
+  background: var(--color-green);
+  color: var(--color-white);
 }
 
 .statusCompleted {
-  background: var(--color-e9f8f0);
-  color: var(--color-1c8c4a);
+  background: var(--color-green);
+  color: var(--color-white);
 }
 
 .progressWrap {
@@ -215,9 +214,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--color-4b4b57);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .metricGrid {
@@ -233,7 +232,7 @@
 }
 
 .detailCard {
-  background: var(--color-ffffff);
+  background: var(--color-whitefff);
   border-radius: 18px;
   padding: 18px;
   border: 1px solid var(--color-efe5ff);
@@ -252,7 +251,7 @@
 
 .detailTitle {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 500;
   color: var(--color-1f1f2f);
 }
 
@@ -262,9 +261,9 @@
   gap: 12px;
   font-size: 13px;
   color: var(--color-333344);
-  background: var(--color-f9f8ff);
+  background: var(--color-lightGray);
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius: 5px;
   border: 1px solid var(--color-f0ecff);
 }
 
@@ -279,12 +278,12 @@
 }
 
 .chip {
-  background: var(--color-f1ecff);
-  color: var(--color-5a36d6);
+  background: var(--color-white);
+  color: var(--color-blue);
   font-size: 11px;
   padding: 7px 11px;
   border-radius: 999px;
-  font-weight: 700;
+  font-weight: 500;
   border: 1px solid var(--color-e3d9ff);
 }
 
@@ -306,12 +305,12 @@
 
 .secondaryButton {
   align-self: flex-start;
-  background: var(--color-f1ecff);
-  color: var(--color-5a36d6);
-  border: 1px solid var(--color-e3d9ff);
-  border-radius: 12px;
+  background: var(--color-white);
+  color: var(--color-blue);
+  border: 1px solid var(--color-blue);
+  border-radius: 5px;
   padding: 10px 14px;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -329,12 +328,12 @@
 }
 
 .dangerButton {
-  background: var(--color-ffe5e1);
-  color: var(--color-8f0500);
-  border: 1px solid var(--color-ffc4b8);
-  border-radius: 12px;
+  background: var(--color-white);
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+  border-radius: 8px;
   padding: 10px 14px;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -355,7 +354,7 @@
   color: var(--color-5a36d6);
   font-size: 11px;
   padding: 6px 10px;
-  border-radius: 12px;
+  border-radius: 5px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   border: 1px solid var(--color-e3d9ff);
@@ -370,7 +369,7 @@
 .fieldLabel {
   font-size: 12px;
   color: var(--color-6a6a7a);
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.2px;
 }
 
@@ -378,12 +377,12 @@
 .select,
 .textarea {
   width: 100%;
-  border: 1px solid var(--color-e3d9ff);
-  border-radius: 10px;
+  border: 1px solid var(--color-gray);
+  border-radius: 5px;
   padding: 10px 12px;
   font-size: 14px;
-  color: var(--color-1f1f2f);
-  background: var(--color-ffffff);
+  color: var(--color-black);
+  background: var(--color-whitefff);
 }
 
 .textarea {
@@ -426,13 +425,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--color-f1ecff);
-  border: 1px solid var(--color-e3d9ff);
-  color: var(--color-5a36d6);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray);
+  color: var(--color-blue);
   border-radius: 14px;
   padding: 6px 10px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .pillRemove {
@@ -457,9 +456,9 @@
 
 .teamPanel,
 .contributorsPanel {
-  background: var(--color-f9f8ff);
+  background: var(--color-lightGray);
   border: 1px solid var(--color-e3d9ff);
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 14px;
   display: flex;
   flex-direction: column;
@@ -476,7 +475,7 @@
 .panelLabel {
   margin: 0;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 500;
   letter-spacing: 0.4px;
   color: var(--color-4b4b57);
   text-transform: uppercase;
@@ -489,17 +488,16 @@
 }
 
 .noteRow {
-  border: 1px solid var(--color-e3d9ff);
-  background: var(--color-f9f8ff);
-  border-radius: 12px;
-  padding: 12px 14px;
+  background: var(--color-white);
+  border-radius: 5px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
 .noteAuthor {
-  font-weight: 800;
+  font-weight: 500;
   color: var(--color-1f1f2f);
   margin: 0 0 4px;
 }
@@ -508,7 +506,7 @@
   margin: 0;
   color: var(--color-6a6a7a);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .noteText {
@@ -526,12 +524,10 @@
 }
 
 .teamRemove {
-  background: var(--color-fae1dd);
-  color: var(--color-8f0500);
-  border: 1px solid var(--color-ffc4b8);
-  border-radius: 10px;
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+  border-radius: 5px;
   padding: 8px 12px;
-  font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -547,11 +543,11 @@
 }
 
 .noticeBox {
-  border: 1px dashed var(--color-ffc4b8);
-  background: var(--color-fff5f3);
-  color: var(--color-8f0500);
+  border: 1px dashed var(--color-lightGray);
+  background: var(--color-lightGray);
+  color: var(--color-secondary);
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: 5px;
   font-size: 13px;
   line-height: 1.5;
 }
@@ -561,13 +557,13 @@
   text-align: center;
   border: 1px dashed var(--color-d8d2c6);
   border-radius: 16px;
-  background: var(--color-fffaf1);
+  background: var(--color-whiteaf1);
 }
 
 .emptyState h3 {
   font-size: 18px;
   margin-bottom: 8px;
-  color: var(--color-1f1f1f);
+  color: var(--color-textGray);
 }
 
 .emptyState p {
@@ -576,8 +572,8 @@
 }
 
 .emptyState a {
-  color: var(--color-fff);
-  background: var(--color-8f0500);
+  color: var(--color-white);
+  background: var(--color-secondary);
   padding: 10px 18px;
   border-radius: 999px;
   font-size: 12px;

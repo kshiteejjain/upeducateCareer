@@ -1,6 +1,6 @@
 /* ===============================================
    Red & var(--color-white) Login Page — Clean Animated Layout
-   Theme: Red (var(--color-8f0500)), Yellow (var(--color-fdba13)), var(--color-white)
+   Theme: Red (var(--color-secondary)), Yellow (var(--color-fdba13)), var(--color-white)
    =============================================== */
 
 .registerPage {
@@ -24,7 +24,7 @@
 
 .brand {
   font-size: 2.8rem;
-  font-weight: 700;
+  font-weight: 500;
   margin-bottom: 20px;
   letter-spacing: 1px;
 }
@@ -40,7 +40,7 @@
 /* ---------- RIGHT FORM SECTION ---------- */
 .rightSection {
   width: 50%;
-  background: var(--color-ffffff);
+  background: var(--color-whitefff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,7 +56,7 @@
 
 .heading {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-111);
 }
 
@@ -75,7 +75,7 @@
 /* ---------- BUTTONS ---------- */
 .signInButton {
   background: var(--color-fdba13);
-  color: var(--color-8f0500);
+  color: var(--color-secondary);
   border: none;
   padding: 12px;
   border-radius: 8px;
@@ -87,15 +87,15 @@
 }
 
 .signInButton:hover {
-  background: var(--color-8f0500);
-  color: var(--color-fff);
+  background: var(--color-secondary);
+  color: var(--color-white);
   box-shadow: 0 4px 15px var(--color-rgba-143-5-0-03);
 }
 
 .createAccountButton {
   background: transparent;
-  border: 2px solid var(--color-8f0500);
-  color: var(--color-8f0500);
+  border: 2px solid var(--color-secondary);
+  color: var(--color-secondary);
   padding: 12px;
   width: 100%;
   border-radius: 8px;
@@ -107,8 +107,8 @@
 }
 
 .createAccountButton:hover {
-  background: var(--color-8f0500);
-  color: var(--color-fff);
+  background: var(--color-secondary);
+  color: var(--color-white);
   transform: scale(1.02);
 }
 
@@ -122,7 +122,7 @@
 .forgotPassword {
   background: none;
   border: none;
-  color: var(--color-8f0500);
+  color: var(--color-secondary);
   font-size: 0.85rem;
   cursor: pointer;
   transition: 0.3s;
@@ -141,7 +141,7 @@
   color: var(--color-888);
 }
 .divider span {
-  background: var(--color-fff);
+  background: var(--color-white);
   padding: 0 10px;
   position: relative;
   z-index: 1;
@@ -166,7 +166,7 @@
 }
 
 .link {
-  color: var(--color-8f0500);
+  color: var(--color-secondary);
   text-decoration: none;
   transition: 0.3s;
 }

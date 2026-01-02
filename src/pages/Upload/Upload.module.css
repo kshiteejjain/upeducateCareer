@@ -3,9 +3,9 @@
 }
 
 .card {
-  background: var(--color-ffffff);
+  background: var(--color-white);
   border-radius: 18px;
-  border: 1px solid var(--color-efe5ff);
+  border: 1px solid var(--color-gray);
   box-shadow: 0 12px 28px var(--color-rgba-80-58-180-01);
   padding: 22px 24px;
   display: flex;
@@ -23,13 +23,13 @@
 .title {
   margin: 0;
   font-size: 22px;
-  font-weight: 800;
-  color: var(--color-1f1f2f);
+  font-weight: 500;
+  color: var(--color-textGray);
 }
 
 .subtitle {
   margin: 0;
-  color: var(--color-4b4b57);
+  color: var(--color-textGray);
   font-size: 14px;
 }
 
@@ -39,10 +39,11 @@
   justify-content: center;
   gap: 8px;
   padding: 12px 16px;
-  background: linear-gradient(135deg, var(--color-7b4bff), var(--color-ff6fba));
-  color: var(--color-fff);
-  border-radius: 12px;
-  font-weight: 800;
+  background-color: var(--color-white);
+  color: var(--color-textGray);
+  border: 1px solid var(--color-gray);
+  border-radius: 5px;
+  font-weight: 500;
   cursor: pointer;
   box-shadow: 0 10px 24px var(--color-rgba-123-75-255-03);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -72,57 +73,57 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--color-e1e1e1);
+  background: var(--color-primary);
   box-shadow: 0 0 0 0 var(--color-rgba-123-75-255-02);
   animation: pulse 1.4s infinite;
 }
 
 .statusText {
   font-size: 13px;
-  color: var(--color-4b4b57);
+  color: var(--color-blue);
 }
 
 .uploading {
-  background: var(--color-fdba13);
+  background: var(--color-green);
 }
 
 .success {
-  background: var(--color-1c8c4a);
+  background: var(--color-green);
 }
 
 .error {
-  background: var(--color-e35f5f);
+  background: var(--color-green);
 }
 
 .parsing {
-  background: var(--color-fdba13);
+  background: var(--color-green);
 }
 
 .ready {
-  background: var(--color-1c8c4a);
+  background: var(--color-green);
 }
 
 .hint {
   font-size: 12px;
-  color: var(--color-4b4b57);
-  background: var(--color-f7f5ff);
-  border: 1px dashed var(--color-d4c9ff);
-  border-radius: 10px;
+  color: var(--color-textGray);
+  background: var(--color-white);
+  border: 1px dashed var(--color-gray);
+  border-radius: 5px;
   padding: 10px 12px;
 }
 
 .hint code {
-  background: var(--color-fff);
+  background: var(--color-white);
   border-radius: 6px;
   padding: 2px 6px;
-  border: 1px solid var(--color-efe5ff);
+  border: 1px solid var(--color-gray);
 }
 
 .previewCard {
   margin-top: 16px;
-  background: var(--color-ffffff);
+  background: var(--color-white);
   border-radius: 18px;
-  border: 1px solid var(--color-efe5ff);
+  border: 1px solid var(--color-gray);
   box-shadow: 0 12px 28px var(--color-rgba-80-58-180-008);
   padding: 18px 20px;
   display: flex;
@@ -139,23 +140,23 @@
 
 .previewTitle {
   margin: 0;
-  font-weight: 800;
-  color: var(--color-1f1f2f);
+  font-weight: 500;
+  color: var(--color-textGray);
 }
 
 .previewSubtitle {
   margin: 4px 0 0 0;
   font-size: 13px;
-  color: var(--color-4b4b57);
+  color: var(--color-textGray);
 }
 
 .submitButton {
-  background: linear-gradient(135deg, var(--color-2ad4a9), var(--color-5b8bff));
-  color: var(--color-fff);
+  background-color: var(--color-primary);
+  color: var(--color-black);
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 10px 14px;
-  font-weight: 800;
+  font-weight: 500;
   cursor: pointer;
   box-shadow: 0 10px 24px var(--color-rgba-91-139-255-025);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -175,8 +176,8 @@
 
 .previewList {
   overflow: auto;
-  border: 1px solid var(--color-efe5ff);
-  border-radius: 12px;
+  border: 1px solid var(--color-gray);
+  border-radius: 5px;
 }
 
 .previewTable {
@@ -187,24 +188,25 @@
 
 .previewTable th,
 .previewTable td {
-  border-bottom: 1px solid var(--color-f0eaff);
+  border-bottom: 1px solid var(--color-gray);
   padding: 10px 12px;
   text-align: left;
   font-size: 13px;
 }
 
 .previewTable th {
-  background: var(--color-faf7ff);
-  font-weight: 800;
-  color: var(--color-1f1f2f);
+  background: var(--color-lightGray);
+  font-weight: 500;
+  color: var(--color-textGray);
+  white-space: nowrap;
 }
 
 .previewTable td {
-  color: var(--color-2f2f3f);
+  color: var(--color-textGray);
 }
 
 .previewTable tr:hover td {
-  background: var(--color-f7f5ff);
+  background: var(--color-lightGray);
 }
 
 @keyframes fadeIn {

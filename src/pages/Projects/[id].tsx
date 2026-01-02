@@ -14,6 +14,7 @@ import { getSession, type AuthUser } from "@/utils/authSession";
 import { ParticipantsStack } from "@/components/ParticipantsStack/ParticipantsStack";
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
 import { toast } from "react-toastify";
+import { useLoader } from "@/components/Loader/LoaderProvider";
 
 const resolveProjectId = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
@@ -73,17 +74,14 @@ const formatDateDisplay = (value: string | undefined | null) => {
 export default function ProjectDetails() {
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [sessionUser, setSessionUser] = useState<AuthUser | null>(null);
-  const [isJoining, setIsJoining] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isSavingEdit, setIsSavingEdit] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [teamActionTarget, setTeamActionTarget] = useState<string | null>(null);
-  const [editTechInput, setEditTechInput] = useState("");
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [joinRole, setJoinRole] = useState("");
   const [joinContribution, setJoinContribution] = useState("");
+  const [editTechInput, setEditTechInput] = useState("");
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const { withLoader, isLoading } = useLoader();
   const [editForm, setEditForm] = useState<EditFormState>({
     name: "",
     category: "",
@@ -107,7 +105,6 @@ export default function ProjectDetails() {
         const projectId = resolveProjectId(router.query.id);
         if (!projectId) {
           setProject(null);
-          setIsLoading(false);
           return;
         }
         const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
@@ -117,7 +114,6 @@ export default function ProjectDetails() {
         if (!response.ok) {
           if (response.status === 404) {
             setProject(null);
-            setIsLoading(false);
             return;
           }
           throw new Error(`Failed to load project (${response.status})`);
@@ -129,12 +125,12 @@ export default function ProjectDetails() {
         toast.error("Could not load project details.");
         setProject(null);
       } finally {
-        setIsLoading(false);
+        setHasLoaded(true);
       }
     };
 
-    void fetchProject();
-  }, [router.isReady, router.query.id]);
+    void withLoader(fetchProject, "Loading project details...");
+  }, [router.isReady, router.query.id, withLoader]);
 
   useEffect(() => {
     setSessionUser(getSession());
@@ -261,36 +257,35 @@ export default function ProjectDetails() {
     }
 
     try {
-      setIsJoining(true);
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-      const response = await fetch(`${apiBaseUrl}/api/projects`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: project.id,
-          participant: participantName,
-          participantRole: joinRole.trim(),
-          participantContribution: joinContribution.trim(),
-        }),
-      });
+      await withLoader(async () => {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/projects`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: project.id,
+            participant: participantName,
+            participantRole: joinRole.trim(),
+            participantContribution: joinContribution.trim(),
+          }),
+        });
 
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        throw new Error(
-          (errorBody as { message?: string }).message ??
-          "Failed to join project"
-        );
-      }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          throw new Error(
+            (errorBody as { message?: string }).message ??
+            "Failed to join project"
+          );
+        }
 
-      const updated = (await response.json()) as Project;
-      setProject(normalizeProject(updated, updated.id));
+        const updated = (await response.json()) as Project;
+        setProject(normalizeProject(updated, updated.id));
+      }, "Joining the project team...");
       toast.success("You're now participating in this project.");
       setIsJoinModalOpen(false);
     } catch (error) {
       console.error("Failed to join project", error);
       toast.error("Could not join the project. Please try again.");
-    } finally {
-      setIsJoining(false);
     }
   };
 
@@ -354,43 +349,42 @@ export default function ProjectDetails() {
     }
 
     try {
-      setIsSavingEdit(true);
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-      const response = await fetch(`${apiBaseUrl}/api/projects`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: project.id,
-          name: editForm.name.trim(),
-          category: editForm.category.trim(),
-          description: editForm.description.trim(),
-          startDate: editForm.startDate,
-          deadline: deadlineValue,
-          durationDays: duration,
-          budget: editForm.budget.trim(),
-          status: statusValue,
-          progress: progressValue,
-          techStack: editForm.techStack,
-        }),
-      });
+      await withLoader(async () => {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/projects`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: project.id,
+            name: editForm.name.trim(),
+            category: editForm.category.trim(),
+            description: editForm.description.trim(),
+            startDate: editForm.startDate,
+            deadline: deadlineValue,
+            durationDays: duration,
+            budget: editForm.budget.trim(),
+            status: statusValue,
+            progress: progressValue,
+            techStack: editForm.techStack,
+          }),
+        });
 
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        throw new Error(
-          (errorBody as { message?: string }).message ??
-          "Failed to update project"
-        );
-      }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          throw new Error(
+            (errorBody as { message?: string }).message ??
+            "Failed to update project"
+          );
+        }
 
-      const updated = (await response.json()) as Project;
-      setProject(normalizeProject(updated, updated.id));
+        const updated = (await response.json()) as Project;
+        setProject(normalizeProject(updated, updated.id));
+      }, "Saving project updates...");
       setIsEditOpen(false);
       toast.success("Project updated.");
     } catch (error) {
       console.error("Failed to update project", error);
       toast.error("Could not update the project.");
-    } finally {
-      setIsSavingEdit(false);
     }
   };
 
@@ -406,26 +400,25 @@ export default function ProjectDetails() {
     if (!confirmed) return;
 
     try {
-      setIsDeleting(true);
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-      const response = await fetch(
-        `${apiBaseUrl}/api/projects?id=${encodeURIComponent(project.id)}`,
-        { method: "DELETE" }
-      );
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        throw new Error(
-          (errorBody as { message?: string }).message ??
-          "Failed to delete project"
+      await withLoader(async () => {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(
+          `${apiBaseUrl}/api/projects?id=${encodeURIComponent(project.id)}`,
+          { method: "DELETE" }
         );
-      }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          throw new Error(
+            (errorBody as { message?: string }).message ??
+            "Failed to delete project"
+          );
+        }
+      }, "Deleting project...");
       toast.success("Project deleted.");
       void router.push("/Projects");
     } catch (error) {
       console.error("Failed to delete project", error);
       toast.error("Could not delete the project.");
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -442,34 +435,33 @@ export default function ProjectDetails() {
     if (!confirmed) return;
 
     try {
-      setTeamActionTarget(member);
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-      const response = await fetch(`${apiBaseUrl}/api/projects`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: project.id,
-          participant: member,
-          action: "remove",
-        }),
-      });
+      await withLoader(async () => {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/projects`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: project.id,
+            participant: member,
+            action: "remove",
+          }),
+        });
 
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        throw new Error(
-          (errorBody as { message?: string }).message ??
-          "Failed to remove member"
-        );
-      }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          throw new Error(
+            (errorBody as { message?: string }).message ??
+            "Failed to remove member"
+          );
+        }
 
-      const updated = (await response.json()) as Project;
-      setProject(normalizeProject(updated, updated.id));
+        const updated = (await response.json()) as Project;
+        setProject(normalizeProject(updated, updated.id));
+      }, "Updating team roster...");
       toast.success("Team member removed.");
     } catch (error) {
       console.error("Failed to remove team member", error);
       toast.error("Could not remove that member.");
-    } finally {
-      setTeamActionTarget(null);
     }
   };
 
@@ -514,9 +506,9 @@ export default function ProjectDetails() {
                   type="button"
                   className={styles.dangerButton}
                   onClick={handleDeleteProject}
-                  disabled={isDeleting}
+                  disabled={isLoading}
                 >
-                  {isDeleting ? "Deleting..." : "Delete Project"}
+                  {isLoading ? "Working..." : "Delete Project"}
                 </button>
               </>
             ) : null}
@@ -530,7 +522,7 @@ export default function ProjectDetails() {
           </div>
         </section>
 
-        {isLoading ? (
+        {!hasLoaded ? (
           <section className={styles.emptyState}>
             <h3>Loading project details</h3>
             <p>Gathering the latest snapshot for this project.</p>
@@ -558,9 +550,9 @@ export default function ProjectDetails() {
                   <button
                     className={styles.secondaryButton}
                     onClick={startJoinFlow}
-                    disabled={isJoining}
+                    disabled={isLoading}
                   >
-                    {isJoining ? "Joining..." : "Join the team"}
+                    Join the team
                   </button>
                 </div>
 
@@ -682,9 +674,9 @@ export default function ProjectDetails() {
                   <button
                     className={styles.secondaryButton}
                     onClick={startJoinFlow}
-                    disabled={isJoining}
+                    disabled={isLoading}
                   >
-                    {isJoining ? "Joining..." : "Join the team"}
+                    Join the team
                   </button>
                 </div>
                 <div className={styles.teamLayout}>
@@ -735,9 +727,9 @@ export default function ProjectDetails() {
                                     type="button"
                                     className={styles.teamRemove}
                                     onClick={() => void handleRemoveParticipant(member)}
-                                    disabled={teamActionTarget === member}
+                                    disabled={isLoading}
                                   >
-                                    {teamActionTarget === member ? "Removing..." : "Remove"}
+                                    Remove
                                   </button>
                                 ) : null}
                               </div>
@@ -965,16 +957,16 @@ export default function ProjectDetails() {
                   type="button"
                   className={headerStyles.ghostButton}
                   onClick={() => setIsEditOpen(false)}
-                  disabled={isSavingEdit}
+                  disabled={isLoading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className={headerStyles.submitButton}
-                  disabled={isSavingEdit}
+                  disabled={isLoading}
                 >
-                  {isSavingEdit ? "Saving..." : "Save Changes"}
+                  {isLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -1041,16 +1033,16 @@ export default function ProjectDetails() {
                   type="button"
                   className={headerStyles.ghostButton}
                   onClick={() => setIsJoinModalOpen(false)}
-                  disabled={isJoining}
+                  disabled={isLoading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className={headerStyles.submitButton}
-                  disabled={isJoining}
+                  disabled={isLoading}
                 >
-                  {isJoining ? "Joining..." : "Confirm & Join"}
+                  {isLoading ? "Working..." : "Confirm & Join"}
                 </button>
               </div>
             </form>

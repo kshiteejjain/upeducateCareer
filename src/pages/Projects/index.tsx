@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { ParticipantsStack } from "@/components/ParticipantsStack/ParticipantsStack";
 import { Tooltip } from "react-tooltip";
 import { ProgressBar } from "@/components/ProgressBar/ProgressBar";
+import { useLoader } from "@/components/Loader/LoaderProvider";
 
 type FormState = typeof projectFormSchema.columns;
 
@@ -65,7 +66,7 @@ const categoryOptions = [
 const categoryPalette = [
   "#7b4bff",
   "#ff6fba",
-  "#1f74d3",
+  "#blue",
   "#1c8c4a",
   "#f18f01",
   "#fdba13",
@@ -113,8 +114,8 @@ export default function Projects() {
     createRecordFromSchema(projectFormSchema)
   );
   const [techInput, setTechInput] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [aiLoading, setAiLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const { withLoader, isLoading } = useLoader();
   const todayString = useMemo(() => formatDate(new Date()), []);
 
   useEffect(() => {
@@ -131,12 +132,12 @@ export default function Projects() {
         console.error("Failed to load projects", error);
         toast.error("Could not load projects right now.");
       } finally {
-        setIsLoading(false);
+        setHasLoaded(true);
       }
     };
 
-    fetchProjects();
-  }, []);
+    void withLoader(fetchProjects, "Loading your workspace projects...");
+  }, [withLoader]);
 
   const aiQueue = useMemo(
     () => aiProjectTemplates.map((template) => ({ ...template })),
@@ -234,24 +235,26 @@ export default function Projects() {
 
     const saveProject = async () => {
       try {
-        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-        const response = await fetch(`${apiBaseUrl}/api/projects`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(projectPayload),
-        });
-        if (!response.ok) {
-          const errorBody = await response.json().catch(() => ({}));
-          throw new Error(
-            (errorBody as { message?: string }).message ??
-            "Failed to save project"
-          );
-        }
-        const created = (await response.json()) as Project;
-        setProjects((prev) => [normalizeProject(created, created.id), ...prev]);
-        setIsModalOpen(false);
-        setFormState(createRecordFromSchema(projectFormSchema));
-        setTechInput("");
+        await withLoader(async () => {
+          const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+          const response = await fetch(`${apiBaseUrl}/api/projects`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(projectPayload),
+          });
+          if (!response.ok) {
+            const errorBody = await response.json().catch(() => ({}));
+            throw new Error(
+              (errorBody as { message?: string }).message ??
+              "Failed to save project"
+            );
+          }
+          const created = (await response.json()) as Project;
+          setProjects((prev) => [normalizeProject(created, created.id), ...prev]);
+          setIsModalOpen(false);
+          setFormState(createRecordFromSchema(projectFormSchema));
+          setTechInput("");
+        }, "Saving your project...");
         toast.success("Project created");
       } catch (error) {
         console.error("Failed to save project", error);
@@ -263,7 +266,6 @@ export default function Projects() {
   };
 
   const handleAIGenerate = async () => {
-    setAiLoading(true);
     const recentProjects = projects.slice(0, 3).map((p) => ({
       name: p.name,
       category: p.category,
@@ -272,54 +274,54 @@ export default function Projects() {
     }));
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-      const response = await fetch(`${apiBaseUrl}/api/generateProject`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recentProjects }),
-      });
+      await withLoader(async () => {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/generateProject`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ recentProjects }),
+        });
 
-      if (!response.ok) {
-        throw new Error(
-          (await response.json().catch(() => ({}))).message ??
-            "Failed to generate project"
-        );
-      }
+        if (!response.ok) {
+          throw new Error(
+            (await response.json().catch(() => ({}))).message ??
+              "Failed to generate project"
+          );
+        }
 
-      const generated = (await response.json()) as {
-        name?: string;
-        category?: string;
-        description?: string;
-        durationDays?: number;
-        techStack?: string[];
-        budget?: string;
-      };
+        const generated = (await response.json()) as {
+          name?: string;
+          category?: string;
+          description?: string;
+          durationDays?: number;
+          techStack?: string[];
+          budget?: string;
+        };
 
-      const durationDays = generated.durationDays || 30;
-      const start = formatDate(new Date());
+        const durationDays = generated.durationDays || 30;
+        const start = formatDate(new Date());
 
-      setFormState((prev) => ({
-        ...prev,
-        name: generated.name || prev.name,
-        durationDays: String(durationDays),
-        category: generated.category || prev.category,
-        techStack: generated.techStack ?? [],
-        description:
-          generated.description ||
-          "Project scope and milestones are being defined.",
-        startDate: start,
-        budget: generated.budget || "TBD",
-      }));
-      setTechInput("");
-      setIsAiPrefill(true);
-      setIsModalOpen(true);
+        setFormState((prev) => ({
+          ...prev,
+          name: generated.name || prev.name,
+          durationDays: String(durationDays),
+          category: generated.category || prev.category,
+          techStack: generated.techStack ?? [],
+          description:
+            generated.description ||
+            "Project scope and milestones are being defined.",
+          startDate: start,
+          budget: generated.budget || "TBD",
+        }));
+        setTechInput("");
+        setIsAiPrefill(true);
+        setIsModalOpen(true);
+      }, "Assembling an AI-powered project idea...");
     } catch (error) {
       console.error("Failed to generate AI project", error);
       toast.error(
         error instanceof Error ? error.message : "Could not generate project."
       );
-    } finally {
-      setAiLoading(false);
     }
   };
 
@@ -343,6 +345,7 @@ export default function Projects() {
                 setTechInput("");
                 setIsModalOpen(true);
               }}
+              disabled={isLoading}
             >
               Add Project
             </button>
@@ -350,28 +353,27 @@ export default function Projects() {
               type="button"
               className={styles.secondaryAction}
               onClick={handleAIGenerate}
-              disabled={aiLoading}
+              disabled={isLoading}
             >
-              {aiLoading ? "Generating..." : "AI Generate Project"}
+              {isLoading ? "Working..." : "AI Generate Project"}
             </button>
           </div>
         </section>
 
-        {isLoading ? (
+        {projects.length === 0 ? (
           <section className={styles.cards}>
             <article className={styles.card}>
-              <p>Loading projects...</p>
+              <p>
+                {hasLoaded
+                  ? "No projects yet. Add your first project."
+                  : "Preparing your projects..."}
+              </p>
             </article>
           </section>
         ) : (
           <section className={styles.cards}>
-            {projects.length === 0 ? (
-              <article className={styles.card}>
-                <p>No projects yet. Add your first project.</p>
-              </article>
-            ) : (
-              projects.map((project) => (
-                <article key={project.id} className={styles.card}>
+            {projects.map((project) => (
+              <article key={project.id} className={styles.card}>
                   <div className={styles.cardHeader}>
                     <div>
                       <p
@@ -461,9 +463,8 @@ export default function Projects() {
                       View Project
                     </Link>
                   </div>
-                </article>
-              ))
-            )}
+              </article>
+            ))}
           </section>
         )}
       </div>

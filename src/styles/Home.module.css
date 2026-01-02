@@ -1,6 +1,6 @@
 .page {
   --background: var(--color-fafafa);
-  --foreground: var(--color-fff);
+  --foreground: var(--color-white);
 
   --text-primary: var(--color-000);
   --text-secondary: var(--color-666);

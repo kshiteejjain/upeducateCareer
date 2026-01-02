@@ -2,6 +2,7 @@ import { useState } from "react";
 import Layout from "@/components/Layout/Layout";
 import styles from "./Upload.module.css";
 import { toast } from "react-toastify";
+import { useLoader } from "@/components/Loader/LoaderProvider";
 
 type UploadStatus =
   | "idle"
@@ -164,6 +165,7 @@ const parseCsv = (text: string): MappedUser[] => {
 export default function UploadUsers() {
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [previewUsers, setPreviewUsers] = useState<MappedUser[]>([]);
+  const { withLoader, isLoading } = useLoader();
 
   const handleFileSelection = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -205,18 +207,20 @@ export default function UploadUsers() {
     setStatus("uploading");
 
     try {
-      const response = await fetch("/api/uploadUsers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ users: previewUsers }),
-      });
+      await withLoader(async () => {
+        const response = await fetch("/api/uploadUsers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ users: previewUsers }),
+        });
 
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        throw new Error(
-          (errorBody as { message?: string }).message ?? "Upload failed"
-        );
-      }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          throw new Error(
+            (errorBody as { message?: string }).message ?? "Upload failed"
+          );
+        }
+      }, "Syncing users to the database...");
 
       setStatus("success");
       setPreviewUsers([]);
@@ -233,7 +237,9 @@ export default function UploadUsers() {
   };
 
   const statusLabel =
-    status === "parsing"
+    isLoading
+      ? "Saving to database..."
+      : status === "parsing"
       ? "Reading CSV..."
       : status === "uploading"
       ? "Saving to database..."
@@ -297,9 +303,9 @@ export default function UploadUsers() {
               <button
                 className={styles.submitButton}
                 onClick={handleUploadToDatabase}
-                disabled={status === "uploading"}
+                disabled={isLoading}
               >
-                {status === "uploading" ? "Uploading..." : "Upload to database"}
+                {isLoading ? "Uploading..." : "Upload to database"}
               </button>
             </div>
 

@@ -1,5 +1,5 @@
 .page {
-  padding: 24px 28px 40px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -12,12 +12,12 @@
   gap: 20px;
   padding: 24px;
   border-radius: 18px;
-  background:var(--color-e1e1e1);
+  background:var(--color-white);
 }
 
 .title {
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-1d1d1d);
   margin-bottom: 8px;
 }
@@ -35,31 +35,23 @@
 }
 
 .primaryAction {
-  background: var(--color-8f0500);
-  color: var(--color-fff);
+  background: var(--color-secondary);
+  color: var(--color-white);
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 12px 18px;
   font-weight: 500;
   cursor: pointer;
-}
-
-.primaryAction:hover {
-  background: var(--color-b30600);
 }
 
 .secondaryAction {
-  background: var(--color-fdba13);
-  color: var(--color-1f1400);
-  border: none;
-  border-radius: 10px;
+  background: var(--color-white);
+  color: var(--color-blue);
+  border: 1px solid var(--color-blue);
+  border-radius: 5px;
   padding: 12px 18px;
   font-weight: 500;
   cursor: pointer;
-}
-
-.secondaryAction:hover {
-  background: var(--color-eeac05);
 }
 
 .cards {
@@ -69,7 +61,7 @@
 }
 
 .card {
-  background: var(--color-fff);
+  background: var(--color-white);
   border: 1px solid var(--color-f0e2cc);
   border-radius: 8px;
   padding: 18px;
@@ -91,7 +83,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  background-color: var(--color-e1e1e1);
+  background-color: var(--color-lightGray);
   padding: 3px;
   border-radius: 0 8px 0 3px;
 }
@@ -125,8 +117,8 @@
   font-size: 12px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: var(--color-f9edd6);
-  color: var(--color-7b4a00);
+  background: var(--color-lightGray);
+  color: var(--color-textGray);
   font-weight: 500;
   white-space: nowrap;
   margin-left: 8px;
@@ -139,13 +131,13 @@
 }
 
 .statusInProgress {
-  background: var(--color-fbe2cf);
-  color: var(--color-7a2d00);
+  background: var(--color-lightGray);
+  color: var(--color-textGray);
 }
 
 .statusBacklog {
-  background: var(--color-ffeccd);
-  color: var(--color-8c5a00);
+  background: var(--color-lightGray);
+  color: var(--color-textGray);
 }
 
 .statusReview {
@@ -154,17 +146,17 @@
 }
 
 .statusComplete {
-  background: var(--color-e3f4dd);
-  color: var(--color-225e31);
+  background: var(--color-green);
+  color: var(--color-white);
 }
 
 .statusCompleted {
-  background: var(--color-e3f4dd);
-  color: var(--color-225e31);
+  background: var(--color-green);
+  color: var(--color-white);
 }
 
 .cardDescription {
-  color: var(--color-64748b);
+  color: var(--color-muted);
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
@@ -194,13 +186,13 @@
 
 .cardMeta span {
   font-size: 13px;
-  color: var(--color-7a7a7a);
+  color: var(--color-muted);
 }
 
 .cardMeta strong {
   display: block;
   font-size: 13px;
-  color: var(--color-1f1f1f);
+  color: var(--color-muted);
   margin-top: 4px;
   font-weight: 500;
 }
@@ -210,7 +202,7 @@
   align-items: center;
   gap: 10px;
   font-size: 12px;
-  color: var(--color-3b3b3b);
+  color: var(--color-muted);
 }
 
 .chips {
@@ -220,8 +212,8 @@
 }
 
 .chip {
-  color: var(--color-595c5b);
-  background: var(--color-ffffff);
+  color: var(--color-muted);
+  background: var(--color-lightGray);
   border-radius: 20px;
   padding: 5px 12px;
   font-size: 12px;
@@ -230,7 +222,7 @@
 
 .chipMuted {
   background: var(--color-f5f5f5);
-  color: var(--color-7a7a7a);
+  color: var(--color-muted);
   font-size: 12px;
   padding: 5px 8px;
   border-radius: 999px;
@@ -245,18 +237,18 @@
 
 .cardLabel {
   font-size: 12px;
-  color: var(--color-7a7a7a);
+  color: var(--color-muted);
 }
 
 .cardValue {
   font-size: 13px;
   font-weight: 500;
-  color: var(--color-1f1f1f);
+  color: var(--color-textGray);
 }
 
 .viewButton {
   border: none;
-  background: var(--color-fdba13);
+  background: var(--color-primary);
   color: var(--color-000);
   padding: 12px 14px;
   border-radius: 8px;
@@ -279,7 +271,7 @@
 }
 
 .viewButton:hover {
-  background: var(--color-e2a408);
+  box-shadow:  0 0 10px #00000061;
   transform: translateY(-1px);
 }
 
@@ -288,18 +280,18 @@
 }
 
 .aiTooltip {
-  background: var(--color-1f1f2f) !important;
-  color: var(--color-ffffff) !important;
-  border-radius: 10px !important;
+  background: var(--color-black) !important;
+  color: var(--color-white) !important;
+  border-radius: 5px !important;
   padding: 8px 10px !important;
-  box-shadow: 0 10px 22px var(--color-rgba-0-0-0-018);
+  box-shadow: 0 10px 22px var(--color-textGray);
   font-size: 12px !important;
 }
 
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: var(--color-rgba-25-17-6-06);
+  background: #00000070;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -308,7 +300,7 @@
 }
 
 .modal {
-  background: var(--color-fff);
+  background: var(--color-white);
   border-radius: 18px;
   max-width: 920px;
   width: 100%;
@@ -330,14 +322,14 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--color-8f0500);
-  font-weight: 700;
+  color: var(--color-secondary);
+  font-weight: 500;
   margin-bottom: 6px;
 }
 
 .modalTitle {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-1c1c1c);
 }
 
@@ -386,25 +378,25 @@
 }
 
 .ghostButton {
-  border: 1px solid var(--color-d8d2c6);
+  border: 1px solid var(--color-gray);
   background: transparent;
   color: var(--color-3c2f1f);
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 10px 18px;
   font-weight: 500;
   cursor: pointer;
 }
 
 .ghostButton:hover {
-  border-color: var(--color-8f0500);
-  color: var(--color-8f0500);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
 }
 
 .submitButton {
   border: none;
-  background: var(--color-8f0500);
-  color: var(--color-fff);
-  border-radius: 10px;
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border-radius: 5px;
   padding: 10px 18px;
   font-weight: 500;
   cursor: pointer;

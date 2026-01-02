@@ -282,7 +282,7 @@ export default function ResumeBuilder() {
 
   return (
     <Layout>
-      <div className={styles.page}>
+      <>
         <div className={`${styles.header} ${styles.noPrint}`}>
           <div>
             <h2 className={styles.title}>AI Resume Builder</h2>
@@ -733,7 +733,7 @@ export default function ResumeBuilder() {
             )}
           </div>
         </div>
-      </div>
+      </>
     </Layout>
   );
 }

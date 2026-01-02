@@ -7,6 +7,7 @@ import {
   type RegisterFormRecord,
 } from "@/utils/formSchemas";
 import { toast } from "react-toastify";
+import { useLoader } from "@/components/Loader/LoaderProvider";
 
 const initialFormState: RegisterFormRecord = {
   ...createRecordFromSchema(registerFormSchema),
@@ -16,7 +17,7 @@ const initialFormState: RegisterFormRecord = {
 export default function Register() {
   const router = useRouter();
   const [formData, setFormData] = useState<RegisterFormRecord>(initialFormState);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { withLoader, isLoading } = useLoader();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -28,8 +29,6 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    setIsSubmitting(true);
 
     const record = {
       role: formData.role,
@@ -46,30 +45,29 @@ export default function Register() {
     };
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-      const response = await fetch(`${apiBaseUrl}/api/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(record),
-      });
+      await withLoader(async () => {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(record),
+        });
 
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        const message =
-          (errorBody as { message?: string }).message ??
-          "Could not register right now. Please try again.";
-        toast.error(message);
-        setIsSubmitting(false);
-        return;
-      }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          const message =
+            (errorBody as { message?: string }).message ??
+            "Could not register right now. Please try again.";
+          toast.error(message);
+          return;
+        }
 
-      toast.success(`Welcome ${formData.name}! You registered as ${formData.role}.`);
-      router.push("/login");
+        toast.success(`Welcome ${formData.name}! You registered as ${formData.role}.`);
+        router.push("/login");
+      }, "Creating your account...");
     } catch (error) {
       console.error("Failed to register via API", error);
       toast.error("Could not register right now. Please try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -216,8 +214,8 @@ export default function Register() {
               </>
             )}
 
-            <button type="submit" className="btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? "Registering..." : "Register"}
+            <button type="submit" className="btn-primary" disabled={isLoading}>
+              {isLoading ? "Registering..." : "Register"}
             </button>
           </form>
 

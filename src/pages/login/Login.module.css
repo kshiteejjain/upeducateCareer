@@ -1,6 +1,6 @@
 /* ===============================================
    Red & var(--color-white) Login Page — Clean Animated Layout
-   Theme: Red (var(--color-8f0500)), Yellow (var(--color-fdba13)), var(--color-white)
+   Theme: Red (var(--color-secondary)), Yellow (var(--color-fdba13)), var(--color-white)
    =============================================== */
 
 .loginPage {
@@ -24,7 +24,7 @@
 
 .brand {
   font-size: 2.8rem;
-  font-weight: 700;
+  font-weight: 500;
   margin-bottom: 20px;
   letter-spacing: 1px;
 }
@@ -40,7 +40,7 @@
 /* ---------- RIGHT FORM SECTION ---------- */
 .rightSection {
   width: 50%;
-  background: var(--color-ffffff);
+  background: var(--color-whitefff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,7 +56,7 @@
 
 .heading {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-111);
 }
 
@@ -75,7 +75,7 @@
 /* ---------- BUTTONS ---------- */
 .signInButton {
   background: var(--color-fdba13);
-  color: var(--color-8f0500);
+  color: var(--color-secondary);
   border: none;
   padding: 12px;
   border-radius: 8px;
@@ -88,7 +88,7 @@
 
 .signInButton:hover {
   background: var(--color-eeac05);
-  color: var(--color-fff);
+  color: var(--color-white);
   box-shadow: 0 4px 15px var(--color-rgba-143-5-0-03);
 }
 
@@ -116,19 +116,56 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
 .forgotPassword {
-  background: none;
-  border: none;
-  color: var(--color-8f0500);
-  font-size: 0.85rem;
+  text-align: right;
+  margin-top: 15px;
+}
+
+.forgotPasswordLink{
+  font-size: calc(var(--font-size-base) - 2px);
   cursor: pointer;
-  transition: 0.3s;
 }
 
 .forgotPassword:hover {
   text-decoration: underline;
+}
+
+.passwordInputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordInput {
+  padding-right: 44px;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-666);
+  transition: color 0.2s ease;
+}
+
+.eyeButton:hover {
+  color: var(--color-111);
+}
+
+.eyeIcon {
+  width: 22px;
+  height: 22px;
 }
 
 /* ---------- DIVIDER ---------- */
@@ -140,7 +177,7 @@
   color: var(--color-888);
 }
 .divider span {
-  background: var(--color-fff);
+  background: var(--color-white);
   padding: 0 10px;
   position: relative;
   z-index: 1;
@@ -165,13 +202,60 @@
 }
 
 .link {
-  color: var(--color-8f0500);
+  color: var(--color-secondary);
   text-decoration: none;
   transition: 0.3s;
 }
 
 .link:hover {
   text-decoration: underline;
+}
+
+.helperNote {
+  font-size: 0.85rem;
+  color: var(--color-666);
+  margin-top: -6px;
+}
+
+.noticeBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-white3f0, #fff7f3);
+  border: 1px solid var(--color-ffd4c5, #ffd4c5);
+  color: var(--color-secondary);
+  padding: 12px 14px;
+  border-radius: 5px;
+  gap: 10px;
+}
+
+.noticeTitle {
+  font-weight: 600;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.noticeSubtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-666);
+}
+
+.changeButton {
+  background: transparent;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.changeButton:hover {
+  background: var(--color-secondary);
+  color: var(--color-white);
 }
 
 /* ---------- ANIMATIONS ---------- */

@@ -5,6 +5,8 @@ import Table from "@/components/Table/Table";
 import { type Project, normalizeProject } from "@/utils/projectData";
 import { getSession } from "@/utils/authSession";
 import styles from "./Dashboard.module.css";
+import { useLoader } from "@/components/Loader/LoaderProvider";
+import Loader from "@/components/Loader/Loader";
 
 type StatusKey = "completed" | "inprogress" | "backlog";
 type Member = {
@@ -46,11 +48,9 @@ export default function Dashboard() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [userCount, setUserCount] = useState<number>(0);
-  const [loadingProjects, setLoadingProjects] = useState(true);
-  const [loadingUsers, setLoadingUsers] = useState(true);
   const [activeMembers, setActiveMembers] = useState<Member[]>([]);
-  const [loadingMembers, setLoadingMembers] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const { withLoader } = useLoader();
 
   useEffect(() => {
     const session = getSession();
@@ -66,8 +66,6 @@ export default function Dashboard() {
         setProjects(normalized);
       } catch (error) {
         console.error("Dashboard projects fetch failed", error);
-      } finally {
-        setLoadingProjects(false);
       }
     };
 
@@ -80,14 +78,11 @@ export default function Dashboard() {
         setUserCount(result.count ?? 0);
       } catch (error) {
         console.error("Dashboard users fetch failed", error);
-      } finally {
-        setLoadingUsers(false);
       }
     };
 
     const fetchMembers = async (role?: string) => {
       if ((role ?? "").toLowerCase() !== "faculty") {
-        setLoadingMembers(false);
         return;
       }
       try {
@@ -98,16 +93,14 @@ export default function Dashboard() {
         setActiveMembers(result.members ?? []);
       } catch (error) {
         console.error("Dashboard active members fetch failed", error);
-      } finally {
-        setLoadingMembers(false);
       }
     };
 
     const roleValue = session?.role ?? "";
-    void fetchProjects();
-    void fetchUsers();
-    void fetchMembers(roleValue);
-  }, []);
+    void withLoader(fetchProjects, "Loading projects overview...");
+    void withLoader(fetchUsers, "Fetching member counts...");
+    void withLoader(() => fetchMembers(roleValue), "Retrieving active members...");
+  }, [withLoader]);
 
   const completedProjects = useMemo(
     () => projects.filter((p) => statusToKey(p.status) === "completed").length,
@@ -246,28 +239,28 @@ export default function Dashboard() {
       <div className={styles.dashboard}>
         <div className={styles.cards}>
           <div className={styles.card}>
+            <span className={styles.cardGlow} aria-hidden="true" />
             <h3>Total Projects</h3>
-            <h2>{loadingProjects ? "…" : projects.length}</h2>
+            <h2>{projects.length}</h2>
             <p className={styles.greenText}>Projects in the workspace</p>
           </div>
           <div className={styles.card}>
+            <span className={styles.cardGlow} aria-hidden="true" />
             <h3>Completed Projects</h3>
-            <h2>{loadingProjects ? "…" : completedProjects}</h2>
-            <p className={styles.greenText}>Marked as completed</p>
+            <h2>{completedProjects}</h2>
+            <p className={styles.greenText}>Completed by students</p>
           </div>
           <div className={styles.card}>
+            <span className={styles.cardGlow} aria-hidden="true" />
             <h3>Active Members</h3>
-            <h2>{loadingUsers ? "…" : userCount}</h2>
+            <h2>{userCount}</h2>
             <p className={styles.greenText}>Total registered users</p>
           </div>
           <div className={styles.card}>
-            <h3>Backlog Projects</h3>
-            <h2>
-              {loadingProjects
-                ? "…"
-                : Math.max(projects.length - completedProjects, 0)}
-            </h2>
-            <p className={styles.redText}>Action Required</p>
+            <span className={styles.cardGlow} aria-hidden="true" />
+            <h3>Listed Jobs</h3>
+            <h2>95</h2>
+            <p className={styles.redText}>All remote jobs</p>
           </div>
         </div>
 
@@ -285,9 +278,7 @@ export default function Dashboard() {
           {userRole?.toLowerCase() === "faculty" && (
             <div className={styles.tableSection}>
               <h2>Active Members</h2>
-              {loadingMembers ? (
-                <p className={styles.loadingText}>Loading active members...</p>
-              ) : activeMemberRows.length === 0 ? (
+              {activeMemberRows.length === 0 ? (
                 <p className={styles.loadingText}>No active members found.</p>
               ) : (
                 <Table

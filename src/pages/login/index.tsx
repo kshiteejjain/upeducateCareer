@@ -3,12 +3,13 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { getSession, saveSession } from "@/utils/authSession";
 import styles from "./Login.module.css";
+import { useLoader } from "@/components/Loader/LoaderProvider";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const { withLoader, isLoading } = useLoader();
 
   useEffect(() => {
     const existingSession = getSession();
@@ -19,48 +20,47 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-      const response = await fetch(`${apiBaseUrl}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      await withLoader(async () => {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const response = await fetch(`${apiBaseUrl}/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
 
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        const message =
-          (errorBody as { message?: string }).message ??
-          "Invalid email or password.";
-        toast.error(message);
-        return;
-      }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          const message =
+            (errorBody as { message?: string }).message ??
+            "Invalid email or password.";
+          toast.error(message);
+          return;
+        }
 
-      const result = (await response.json()) as {
-        message?: string;
-        user?: { name?: string; role?: string; email?: string; userId?: string };
-      };
+        const result = (await response.json()) as {
+          message?: string;
+          user?: { name?: string; role?: string; email?: string; userId?: string };
+        };
 
-      const authenticatedUser = {
-        ...result.user,
-        email: result.user?.email ?? email,
-      };
-      saveSession(authenticatedUser);
+        const authenticatedUser = {
+          ...result.user,
+          email: result.user?.email ?? email,
+        };
+        saveSession(authenticatedUser);
 
-      const name = authenticatedUser?.name ?? "";
-      toast.success(
-        name
-          ? `Welcome back, ${name}!`
-          : result.message ?? "Login successful."
-      );
-      router.push("/Dashboard");
+        const name = authenticatedUser?.name ?? "";
+        toast.success(
+          name
+            ? `Welcome back, ${name}!`
+            : result.message ?? "Login successful."
+        );
+        router.push("/Dashboard");
+      }, "Signing you in...");
     } catch (error) {
       console.error("Failed to login via API", error);
       toast.error("Could not login right now. Please try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -103,7 +103,9 @@ export default function Login() {
             </div>
 
             <div className="form-group">
-              <label>Password:</label>
+              <div className={styles.passwordRow}>
+                <label>Password:</label>
+              </div>
               <input
                 type="password"
                 className="form-control"
@@ -112,10 +114,18 @@ export default function Login() {
                 placeholder="Enter your password"
                 required
               />
+              <div className={styles.forgotPassword}>
+              <span
+                  className={styles.forgotPasswordLink}
+                  onClick={() => router.push("/login/forgot-password")}
+                >
+                  Forgot password?
+                </span>
+            </div>
             </div>
 
-            <button type="submit" className="btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? "Signing In..." : "Sign In"}
+            <button type="submit" className="btn-primary" disabled={isLoading}>
+              {isLoading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 
@@ -126,7 +136,7 @@ export default function Login() {
           <button
             className={styles.createAccountButton}
             onClick={handleCreateAccount}
-            disabled={isSubmitting}
+            disabled={isLoading}
           >
             Create Account
           </button>

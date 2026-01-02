@@ -12,10 +12,9 @@ const menuItems = [
   { name: "Interview Preparation", path: "/InterviewQuestions" },
   { name: "Professional Resume", path: "/ResumeBuilder" },
   { name: "AI Mock Interview", path: "/comingsoon" },
-  { name: "Discussion Forum", path: "/comingsoon" },
-  { name: "Mentorship", path: "/comingsoon" },
-  { name: 'Resource Library', path: "/comingsoon" },
-  { name: "Upload", path: "/Upload" },
+  { name: "Discussions", path: "/Discussions" },
+  { name: "Mentorship", path: "/Mentorship" },
+  { name: "Bulk Upload", path: "/Upload" },
 ];
 
 export default function Sidebar() {

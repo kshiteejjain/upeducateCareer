@@ -1,203 +1,28 @@
 :root {
   --font-size-base: 15px;
+
+  /* Primary palette (requested) */
+  --color-primary: #fdba13;
+  --color-secondary: #8f0500;
   --color-white: #ffffff;
-  --color-000: #000;
-  --color-0000003b: #0000003b;
-  --color-0070f3: #0070f3;
-  --color-0ea5e9: #0ea5e9;
-  --color-10b981: #10b981;
-  --color-111: #111;
-  --color-111827: #111827;
-  --color-166534: #166534;
-  --color-16a34a: #16a34a;
-  --color-171717: #171717;
-  --color-1a1200: #1a1200;
-  --color-1a1a1a: #1a1a1a;
-  --color-1c1c1c: #1c1c1c;
-  --color-1c8c4a: #1c8c4a;
-  --color-1d1d1d: #1d1d1d;
-  --color-1f1400: #1f1400;
-  --color-1f1f1f: #1f1f1f;
-  --color-1f1f2f: #1f1f2f;
-  --color-1f2937: #1f2937;
-  --color-1f74d3: #1f74d3;
-  --color-225e31: #225e31;
-  --color-2563eb: #2563eb;
-  --color-2a5298: #2a5298;
-  --color-2ad4a9: #2ad4a9;
-  --color-2d3748: #2d3748;
-  --color-2f2f3f: #2f2f3f;
-  --color-333: #333;
-  --color-333344: #333344;
-  --color-383838: #383838;
-  --color-3b3b3b: #3b3b3b;
-  --color-3b82f6: #3b82f6;
-  --color-3c2f1f: #3c2f1f;
-  --color-3e3e3e: #3e3e3e;
-  --color-4a4a4a: #4a4a4a;
-  --color-4b4b57: #4b4b57;
-  --color-595c5b: #595c5b;
-  --color-5a36d6: #5a36d6;
-  --color-5b8bff: #5b8bff;
-  --color-64748b: #64748b;
-  --color-666: #666;
-  --color-667eea: #667eea;
-  --color-6a6a6a: #6a6a6a;
-  --color-6a6a7a: #6a6a7a;
-  --color-6b7280: #6b7280;
-  --color-6c6c6c: #6c6c6c;
-  --color-6c757d: #6c757d;
-  --color-6d4300: #6d4300;
-  --color-6f6049: #6f6049;
-  --color-764ba2: #764ba2;
-  --color-777: #777;
-  --color-7a2d00: #7a2d00;
-  --color-7a3b22: #7a3b22;
-  --color-7a3fe1: #7a3fe1;
-  --color-7a4a00: #7a4a00;
-  --color-7a7a7a: #7a7a7a;
-  --color-7a7a89: #7a7a89;
-  --color-7b4a00: #7b4a00;
-  --color-7b4bff: #7b4bff;
-  --color-7d4e00: #7d4e00;
-  --color-888: #888;
-  --color-8a3ad9: #8a3ad9;
-  --color-8b5cf6: #8b5cf6;
-  --color-8c5a00: #8c5a00;
-  --color-8f0500: #8f0500;
-  --color-92400e: #92400e;
-  --color-999: #999;
-  --color-a10600: #a10600;
-  --color-a86a00: #a86a00;
-  --color-a8a8a8: #a8a8a8;
-  --color-b30600: #b30600;
-  --color-b91c1c: #b91c1c;
-  --color-c0c0c0: #c0c0c0;
-  --color-ccc: #ccc;
-  --color-cf711f: #cf711f;
-  --color-d1d5db: #d1d5db;
-  --color-d4c9ff: #d4c9ff;
-  --color-d8d2c6: #d8d2c6;
-  --color-dc2626: #dc2626;
-  --color-dcd2ff: #dcd2ff;
-  --color-dcfce7: #dcfce7;
-  --color-ddd: #ddd;
-  --color-e0dfea: #e0dfea;
-  --color-e1e1e1: #e1e1e1;
-  --color-e2a408: #e2a408;
-  --color-e35f5f: #e35f5f;
-  --color-e3d9ff: #e3d9ff;
-  --color-e3f4dd: #e3f4dd;
-  --color-e4eaf0: #e4eaf0;
-  --color-e5e7eb: #e5e7eb;
-  --color-e6ddff: #e6ddff;
-  --color-e8e8e8: #e8e8e8;
-  --color-e9e3ff: #e9e3ff;
-  --color-e9ecef: #e9ecef;
-  --color-e9f3ff: #e9f3ff;
-  --color-e9f8f0: #e9f8f0;
-  --color-ebebeb: #ebebeb;
-  --color-ebecf1: #ebecf1;
-  --color-ece6ff: #ece6ff;
-  --color-ece8ff: #ece8ff;
-  --color-ededed: #ededed;
-  --color-ee5a6f: #ee5a6f;
-  --color-eeac05: #eeac05;
-  --color-eef6ff: #eef6ff;
-  --color-ef4444: #ef4444;
-  --color-efe5ff: #efe5ff;
-  --color-f093fb: #f093fb;
-  --color-f0e2cc: #f0e2cc;
-  --color-f0eaff: #f0eaff;
-  --color-f0ecff: #f0ecff;
-  --color-f0f4ff: #f0f4ff;
-  --color-f1ecff: #f1ecff;
-  --color-f2f2f2: #f2f2f2;
-  --color-f3f3f6: #f3f3f6;
-  --color-f3f4f6: #f3f4f6;
-  --color-f5f5f5: #f5f5f5;
-  --color-f6f0ff: #f6f0ff;
-  --color-f7f5ff: #f7f5ff;
-  --color-f8f1ff: #f8f1ff;
-  --color-f8f7ff: #f8f7ff;
-  --color-f8f8f8: #f8f8f8;
-  --color-f8f9fa: #f8f9fa;
-  --color-f9edd6: #f9edd6;
-  --color-f9f8ff: #f9f8ff;
-  --color-f9fafb: #f9fafb;
-  --color-faf7ff: #faf7ff;
-  --color-fafafa: #fafafa;
-  --color-fbe2cf: #fbe2cf;
-  --color-fdba13: #fdba13;
-  --color-fdeecf: #fdeecf;
-  --color-fee2e2: #fee2e2;
-  --color-fef9c3: #fef9c3;
-  --color-ff6b6b: #ff6b6b;
-  --color-ff6fba: #ff6fba;
-  --color-ff8787: #ff8787;
-  --color-ff8c00: #ff8c00;
-  --color-ffa500: #ffa500;
-  --color-ffd700: #ffd700;
-  --color-ffe2d8: #ffe2d8;
-  --color-ffe9df: #ffe9df;
-  --color-ffeccd: #ffeccd;
-  --color-ffed4e: #ffed4e;
-  --color-fff: #fff;
-  --color-fff1db: #fff1db;
-  --color-fff4e6: #fff4e6;
-  --color-fffaf1: #fffaf1;
-  --color-ffffff: #ffffff;
-  --color-rgba-0-0-0-003: rgba(0, 0, 0, 0.03);
-  --color-rgba-0-0-0-004: rgba(0, 0, 0, 0.04);
-  --color-rgba-0-0-0-005: rgba(0, 0, 0, 0.05);
-  --color-rgba-0-0-0-008: rgba(0, 0, 0, 0.08);
-  --color-rgba-0-0-0-01: rgba(0, 0, 0, 0.1);
-  --color-rgba-0-0-0-012: rgba(0, 0, 0, 0.12);
-  --color-rgba-0-0-0-015: rgba(0, 0, 0, 0.15);
-  --color-rgba-0-0-0-018: rgba(0, 0, 0, 0.18);
-  --color-rgba-0-0-0-02: rgba(0, 0, 0, 0.2);
-  --color-rgba-102-126-234-04: rgba(102, 126, 234, 0.4);
-  --color-rgba-102-126-234-05: rgba(102, 126, 234, 0.5);
-  --color-rgba-118-75-162-03: rgba(118, 75, 162, 0.3);
-  --color-rgba-118-75-162-04: rgba(118, 75, 162, 0.4);
-  --color-rgba-123-75-255-0: rgba(123, 75, 255, 0);
-  --color-rgba-123-75-255-02: rgba(123, 75, 255, 0.2);
-  --color-rgba-123-75-255-025: rgba(123, 75, 255, 0.25);
-  --color-rgba-123-75-255-03: rgba(123, 75, 255, 0.3);
-  --color-rgba-123-75-255-035: rgba(123, 75, 255, 0.35);
-  --color-rgba-143-5-0-006: rgba(143, 5, 0, 0.06);
-  --color-rgba-143-5-0-012: rgba(143, 5, 0, 0.12);
-  --color-rgba-143-5-0-025: rgba(143, 5, 0, 0.25);
-  --color-rgba-143-5-0-03: rgba(143, 5, 0, 0.3);
-  --color-rgba-143-5-0-085: rgba(143, 5, 0, 0.85);
-  --color-rgba-160-160-160-03: rgba(160, 160, 160, 0.3);
-  --color-rgba-192-192-192-04: rgba(192, 192, 192, 0.4);
-  --color-rgba-238-90-111-03: rgba(238, 90, 111, 0.3);
-  --color-rgba-25-17-6-06: rgba(25, 17, 6, 0.6);
-  --color-rgba-255-107-107-01: rgba(255, 107, 107, 0.1);
-  --color-rgba-255-107-107-03: rgba(255, 107, 107, 0.3);
-  --color-rgba-255-107-107-04: rgba(255, 107, 107, 0.4);
-  --color-rgba-255-107-107-06: rgba(255, 107, 107, 0.6);
-  --color-rgba-255-140-0-03: rgba(255, 140, 0, 0.3);
-  --color-rgba-255-215-0-01: rgba(255, 215, 0, 0.1);
-  --color-rgba-255-215-0-03: rgba(255, 215, 0, 0.3);
-  --color-rgba-255-215-0-04: rgba(255, 215, 0, 0.4);
-  --color-rgba-255-215-0-06: rgba(255, 215, 0, 0.6);
-  --color-rgba-255-255-255-01: rgba(255, 255, 255, 0.1);
-  --color-rgba-255-255-255-018: rgba(255, 255, 255, 0.18);
-  --color-rgba-255-255-255-03: rgba(255, 255, 255, 0.3);
-  --color-rgba-255-255-255-08: rgba(255, 255, 255, 0.8);
-  --color-rgba-31-31-47-018: rgba(31, 31, 47, 0.18);
-  --color-rgba-31-31-47-024: rgba(31, 31, 47, 0.24);
-  --color-rgba-80-58-180-007: rgba(80, 58, 180, 0.07);
-  --color-rgba-80-58-180-008: rgba(80, 58, 180, 0.08);
-  --color-rgba-80-58-180-01: rgba(80, 58, 180, 0.1);
-  --color-rgba-90-54-214-016: rgba(90, 54, 214, 0.16);
-  --color-rgba-90-54-214-02: rgba(90, 54, 214, 0.2);
-  --color-rgba-91-139-255-025: rgba(91, 139, 255, 0.25);
-  --color-rgba-91-139-255-03: rgba(91, 139, 255, 0.3);
-  --background: var(--color-e4eaf0);
-  --foreground: var(--color-171717);
+  --color-black: #000000;
+  --color-blue: #8b5cf6;
+  --color-green: #10b981;
+  --color-lightGray: #e5e7eb;
+  --color-gray: #cacaca;
+  --color-textGray: #474747;
+  --color-lightYellow: #f9edd6;
+  --color-card-peach: #f8d1c4;
+  --color-card-mint: #c7f2d4;
+  --color-card-sky: #cbe7ff;
+  --color-card-lilac: #e5ddff;
+
+  /* Semantic defaults */
+  --background: var(--color-lightGray);
+  --foreground: #111827;
+  --color-surface: var(--color-white);
+  --color-border: var(--color-lightGray);
+  --color-muted: #6b7280;
 }
 
 html,
@@ -306,7 +131,7 @@ a {
 
 p {
   font-size: 14px;
-  color: var(--color-3e3e3e);
+  color: var(--foreground);
 }
 
 /* Form group wrapper */
@@ -317,47 +142,49 @@ p {
   font-family: 'Ubuntu' !important;
 }
 
-textarea {
-  font-family: 'Ubuntu';
-  line-height: 30px;
-  font-weight: 400;
+input, textarea  {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--color-gray);
+    font-family: 'Ubuntu';
 }
 
 /* Label styling */
 .form-group label {
-  color: var(--color-333);
+  color: var(--color-black);
   margin-bottom: 8px;
   font-size: 14px;
 }
 
 /* Input field */
-input:disabled{
+input:disabled {
   background-color: var(--color-eee);
   cursor: not-allowed;
 }
+
 .form-control {
   padding: 12px 14px;
-  border: 1px solid var(--color-ccc);
+  border: 1px solid var(--color-gray);
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.3s ease;
   outline: none;
-  background: var(--color-fff);
+  background: var(--color-white);
 }
 
 .form-control:focus {
-  border-color: var(--color-eeac05);
-  box-shadow: 0 0 6px var(--color-rgba-143-5-0-025);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-rgba-143-5-0-03);
 }
 
 /* Optional: yellow submit button */
 .btn-primary {
-  background-color: var(--color-fdba13);
-  color: var(--color-000);
+  background-color: var(--color-primary);
+  color: var(--color-black);
   font-weight: 500;
   padding: 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   width: 100%;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -365,47 +192,63 @@ input:disabled{
 }
 
 .btn-primary:hover {
-  background-color: var(--color-eeac05);
+  background-color: var(--color-primary);
   box-shadow: 0 4px 15px var(--color-rgba-143-5-0-03);
 }
 
 .btn-secondary {
-  color: var(--color-fff);
+  color: var(--color-white);
   cursor: pointer;
   box-sizing: border-box;
-  background-color: var(--color-8f0500);
+  background-color: var(--color-secondary);
   border: none;
   border-radius: 8px;
   width: 100%;
   padding: 12px;
   font-weight: 500;
-  transition: all .3s;
+  transition: all 0.3s;
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-eeac05);
+  background-color: var(--color-primary);
   box-shadow: 0 4px 15px var(--color-rgba-143-5-0-03);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--color-gray);
+  color: var(--color-textGray);
+  padding: 10px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  border-color: var(--color-primary);
+  color: var(--foreground);
+  box-shadow: 0 4px 10px var(--color-rgba-0-0-0-008);
 }
 
 .btn-link {
   color: var(--color-black);
-  background-color: var(--color-fdba13);
+  background-color: var(--color-primary);
   padding: 5px 14px;
   display: inline-block;
   border-radius: 5px;
 }
 
 .btn-link:hover {
-  background-color: var(--color-eeac05);
+  background-color: var(--color-primary);
   box-shadow: 0 4px 15px var(--color-rgba-143-5-0-03);
 }
 
 .overlay {
   background: var(--color-rgba-143-5-0-085);
-  color: var(--color-fff);
+  color: var(--color-white);
   padding: 60px;
   text-align: center;
-  border-radius: 12px;
+  border-radius: 5px;
   animation: fadeIn 0.5s ease-in;
   width: 100%;
   height: 100%;

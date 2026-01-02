@@ -3,6 +3,7 @@ import Layout from "@/components/Layout/Layout";
 import Table from "@/components/Table/Table";
 import styles from "./ViewJobs.module.css";
 import headerStyles from "../Projects/AddProject.module.css";
+import { useLoader } from "@/components/Loader/LoaderProvider";
 
 type JobRow = {
   id: string;
@@ -18,8 +19,8 @@ type JobRow = {
 export default function ViewJobs() {
   const headers = ["Job Title", "Company", "Location", "Platform", "Posted", "Status", "Action"];
   const [jobs, setJobs] = useState<JobRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { withLoader } = useLoader();
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -33,13 +34,11 @@ export default function ViewJobs() {
       } catch (err) {
         console.error("Jobs fetch failed", err);
         setError(err instanceof Error ? err.message : "Failed to load jobs");
-      } finally {
-        setLoading(false);
       }
     };
 
-    void fetchJobs();
-  }, []);
+    void withLoader(fetchJobs, "Scanning the latest roles for you...");
+  }, [withLoader]);
 
   const tableRows = useMemo(
     () =>
@@ -76,18 +75,18 @@ export default function ViewJobs() {
         </div>
       </section>
 
-      {loading ? (
-        <p className={styles.jobInfo}>Loading jobs...</p>
-      ) : error ? (
+      {error ? (
         <p className={styles.jobInfo}>Error: {error}</p>
-        ) : (
-          <>
+      ) : jobs.length === 0 ? (
+        <p className={styles.jobInfo}>No jobs available right now.</p>
+      ) : (
+        <>
           <Table headers={headers} data={tableRows} enableStatusFilter={false} />
           <div className={styles.jobInfo}>
             <p>Total {jobs.length} Jobs, Showing 10 jobs per page</p>
           </div>
-          </>
-        )}
+        </>
+      )}
     </Layout>
   );
 }
