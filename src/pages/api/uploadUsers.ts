@@ -67,7 +67,7 @@ export default async function handler(
       continue;
     }
 
-    const userRef = doc(db, "users", email);
+    const userRef = doc(db, "upEducatePlus", email);
     const existing = await getDoc(userRef);
     if (existing.exists()) {
       results.skipped += 1;

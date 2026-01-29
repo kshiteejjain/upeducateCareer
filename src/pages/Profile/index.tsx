@@ -25,8 +25,8 @@ export default function Profile() {
       }
       const data = (await res.json()) as { user?: Record<string, unknown> | null };
       setProfile(data.user ?? null);
-      if (data.user && typeof (data.user as any).mobileNumber === "string") {
-        setMobileDraft((data.user as any).mobileNumber);
+      if (data.user && typeof (data.user as Record<string, unknown>).mobileNumber === "string") {
+        setMobileDraft((data.user as Record<string, unknown>).mobileNumber as string);
       }
     } catch (error) {
       console.error("Profile fetch failed", error);
@@ -84,17 +84,17 @@ export default function Profile() {
     }
   };
 
-  const formatValue = (value: unknown) => {
+  const formatValue = (value: unknown): string => {
     if (!value) return "Not available";
     if (typeof value === "string") return value;
     if (typeof value === "number") return String(value);
-    if (value && typeof (value as any).toDate === "function") {
-      return (value as any).toDate().toLocaleDateString();
+    if (value && typeof (value as Record<string, unknown>).toDate === "function") {
+      return ((value as Record<string, unknown>).toDate as () => Date)().toLocaleDateString();
     }
     if (
       value &&
       typeof value === "object" &&
-      "seconds" in (value as Record<string, unknown>)
+      "seconds" in (value as Record<string, number>)
     ) {
       const seconds = (value as Record<string, number>).seconds;
       if (typeof seconds === "number") {
@@ -124,28 +124,28 @@ export default function Profile() {
           <section className={styles.grid}>
             <div className={`${styles.card} ${styles.glow}`}>
               <div className={styles.badge}>
-                {(profile as any)?.name?.[0] ?? sessionUser.name?.[0] ?? "U"}
+                {((profile as Record<string, unknown>)?.name as string)?.[0] ?? sessionUser.name?.[0] ?? "U"}
               </div>
               <h3 className={styles.cardTitle}>
-                {(profile as any)?.name || sessionUser.name || "User"}
+                {((profile as Record<string, unknown>)?.name as string) || sessionUser.name || "User"}
               </h3>
               <p className={styles.cardMeta}>
-                {(profile as any)?.email || sessionUser.email}
+                {((profile as Record<string, unknown>)?.email as string) || sessionUser.email}
               </p>
               <p className={styles.role}>
-                {(profile as any)?.role || sessionUser.role || "Member"}
+                {((profile as Record<string, unknown>)?.role as string) || sessionUser.role || "Member"}
               </p>
             </div>
 
             <div className={styles.card}>
               <h4 className={styles.label}>User ID</h4>
               <p className={styles.value}>
-                {(profile as any)?.userId ?? sessionUser.userId ?? "Not available"}
+                {((profile as Record<string, unknown>)?.userId as string) ?? sessionUser.userId ?? "Not available"}
               </p>
               <div className={styles.divider} />
               <h4 className={styles.label}>Role</h4>
               <p className={styles.value}>
-                {(profile as any)?.role ?? sessionUser.role ?? "Member"}
+                {((profile as Record<string, unknown>)?.role as string) ?? sessionUser.role ?? "Member"}
               </p>
             </div>
 
@@ -177,33 +177,9 @@ export default function Profile() {
                   <span className={styles.infoLabel}>Profile Created</span>
                   <span className={styles.infoValue}>
                     {formatValue(
-                      (profile as any)?.profileCreatedAt ||
-                        (profile as any)?.createdAt
+                      ((profile as Record<string, unknown>)?.profileCreatedAt as unknown) ||
+                        ((profile as Record<string, unknown>)?.createdAt as unknown)
                     )}
-                  </span>
-                </li>
-                <li className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Subject</span>
-                  <span className={styles.infoValue}>
-                    {formatValue((profile as any)?.subject)}
-                  </span>
-                </li>
-                <li className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Course Name</span>
-                  <span className={styles.infoValue}>
-                    {formatValue((profile as any)?.courseName)}
-                  </span>
-                </li>
-                <li className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Course Duration</span>
-                  <span className={styles.infoValue}>
-                    {formatValue((profile as any)?.courseDuration)}
-                  </span>
-                </li>
-                <li className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Course Start Date</span>
-                  <span className={styles.infoValue}>
-                    {formatValue((profile as any)?.courseStartDate)}
                   </span>
                 </li>
               </ul>

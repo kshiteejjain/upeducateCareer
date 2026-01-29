@@ -1,12 +1,10 @@
-import type { Project } from "./projectData";
 import type { Schema } from "./schemaUtils";
 
 export type RegisterFormRecord = {
-  role: "faculty" | "student";
+  role: "teacher" | "student";
   name: string;
   email: string;
   password: string;
-  subject: string;
   courseName: string;
   courseDuration: string;
   courseStartDate: string;
@@ -17,11 +15,10 @@ export const registerFormSchema: Schema<RegisterFormRecord> = {
   name: "registerForm",
   storageKey: "rnw-register-form",
   columns: {
-    role: "student",
+    role: "teacher",
     name: "",
     email: "",
     password: "",
-    subject: "",
     courseName: "",
     courseDuration: "",
     courseStartDate: "",
@@ -30,11 +27,10 @@ export const registerFormSchema: Schema<RegisterFormRecord> = {
 };
 
 export type RegisterRecord = {
-  role: "faculty" | "student";
+  role: "teacher";
   name: string;
   email: string;
   password: string;
-  subject: string;
   courseName: string;
   courseDuration: string;
   courseStartDate: string;
@@ -50,7 +46,6 @@ export const registerSchema: Schema<RegisterRecord> = {
     name: "",
     email: "",
     password: "",
-    subject: "",
     courseName: "",
     courseDuration: "",
     courseStartDate: "",

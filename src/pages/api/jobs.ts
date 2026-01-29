@@ -19,30 +19,30 @@ const fetchJson = async <T>(url: string, headers?: Record<string, string>) => {
   return (await response.json()) as T;
 };
 
-const mapRemotive = (data: any): JobItem[] => {
-  const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
-  return jobs.map((job: any, idx: number) => ({
-    id: `remotive-${job.id ?? idx}`,
-    title: job.title ?? "Untitled",
-    company: job.company_name ?? "Unknown",
-    location: job.candidate_required_location ?? "Remote",
-    postedAt: job.publication_date ?? "",
+const mapRemotive = (data: Record<string, unknown>): JobItem[] => {
+  const jobs = (data?.jobs as JobItem[]) || [];
+  return jobs.map((job: Record<string, unknown>, idx: number) => ({
+    id: `remotive-${(job.id as string) ?? idx}`,
+    title: (job.title as string) ?? "Untitled",
+    company: (job.company_name as string) ?? "Unknown",
+    location: (job.candidate_required_location as string) ?? "Remote",
+    postedAt: (job.publication_date as string) ?? "",
     platform: "Remotive",
-    status: (job.job_status ?? "").toLowerCase().includes("closed") ? "Closed" : "Open",
-    applyUrl: job.url ?? "#",
+    status: ((job.job_status as string) ?? "").toLowerCase().includes("closed") ? "Closed" : "Open",
+    applyUrl: (job.url as string) ?? "#",
   }));
 };
 
-const mapRemoteOK = (data: any): JobItem[] => {
+const mapRemoteOK = (data: Record<string, unknown>[]): JobItem[] => {
   const jobs = Array.isArray(data) ? data.slice(1) : []; // first item is metadata
-  return jobs.map((job: any, idx: number) => ({
-    id: `remoteok-${job.id ?? idx}`,
-    title: job.position ?? job.title ?? "Untitled",
-    company: job.company ?? "Unknown",
-    location: job.location ?? "Remote",
-    postedAt: job.date ?? job.created_at ?? "",
+  return jobs.map((job: Record<string, unknown>, idx: number) => ({
+    id: `remoteok-${(job.id as string) ?? idx}`,
+    title: (job.position as string) ?? (job.title as string) ?? "Untitled",
+    company: (job.company as string) ?? "Unknown",
+    location: (job.location as string) ?? "Remote",
+    postedAt: (job.date as string) ?? (job.created_at as string) ?? "",
     platform: "RemoteOK",
-    status: job.closed ? "Closed" : "Open",
+    status: (job.closed as boolean) ? "Closed" : "Open",
     applyUrl: job.url ?? job.apply_url ?? "#",
   }));
 };

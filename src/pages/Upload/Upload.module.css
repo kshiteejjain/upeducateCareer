@@ -24,12 +24,12 @@
   margin: 0;
   font-size: 22px;
   font-weight: 500;
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .subtitle {
   margin: 0;
-  color: var(--color-textGray);
+  color: var(--color-text);
   font-size: 14px;
 }
 
@@ -40,7 +40,7 @@
   gap: 8px;
   padding: 12px 16px;
   background-color: var(--color-white);
-  color: var(--color-textGray);
+  color: var(--color-text);
   border: 1px solid var(--color-gray);
   border-radius: 5px;
   font-weight: 500;
@@ -105,7 +105,7 @@
 
 .hint {
   font-size: 12px;
-  color: var(--color-textGray);
+  color: var(--color-text);
   background: var(--color-white);
   border: 1px dashed var(--color-gray);
   border-radius: 5px;
@@ -141,13 +141,13 @@
 .previewTitle {
   margin: 0;
   font-weight: 500;
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .previewSubtitle {
   margin: 4px 0 0 0;
   font-size: 13px;
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .submitButton {
@@ -197,12 +197,12 @@
 .previewTable th {
   background: var(--color-lightGray);
   font-weight: 500;
-  color: var(--color-textGray);
+  color: var(--color-text);
   white-space: nowrap;
 }
 
 .previewTable td {
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .previewTable tr:hover td {

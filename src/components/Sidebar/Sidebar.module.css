@@ -26,18 +26,19 @@
 
 .sidebar li:hover,
 .sidebar li.active {
-  background: var(--color-secondary);
+  background: var(--color-primary);
   transform: translateX(3px);
 }
 
 .sidebar a {
   text-decoration: none;
-  color: var(--color-textGray);
+  color: var(--color-text);
   display: block;
   padding: 18px 15px;
-  border-bottom: 1px solid var(--color-lightGray);
+  border-bottom: 1px solid var(--color-blue-gray);
   font-size: 15px;
   transition: color 0.2s ease;
+  font-size: var(--base-font-size);
 }
 
 .sidebar li:hover a,

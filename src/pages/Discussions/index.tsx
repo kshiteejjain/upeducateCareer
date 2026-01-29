@@ -16,7 +16,7 @@ type FetchState = {
   error: string | null;
 };
 
-const mapHackerNews = (hits: any[]): Discussion[] =>
+const mapHackerNews = (hits: Record<string, unknown>[]): Discussion[] =>
   hits
     .filter((hit) => hit?.title)
     .map((hit) => ({
@@ -24,14 +24,14 @@ const mapHackerNews = (hits: any[]): Discussion[] =>
       source: "Hacker News",
       category: "Engineering",
       summary:
-        (hit._highlightResult?.title?.value as string | undefined) ??
+        ((hit._highlightResult as Record<string, unknown>)?.title as Record<string, unknown>)?.value as string | undefined ??
         "Trending on Hacker News",
       link:
         (hit.url as string | null) ||
         `https://news.ycombinator.com/item?id=${hit.objectID}`,
     }));
 
-const mapDevTo = (articles: any[]): Discussion[] =>
+const mapDevTo = (articles: Record<string, unknown>[]): Discussion[] =>
   articles.map((article) => ({
     title: article.title as string,
     source: "Dev.to",
@@ -42,9 +42,9 @@ const mapDevTo = (articles: any[]): Discussion[] =>
     link: (article.url as string) ?? "https://dev.to",
   }));
 
-const mapReddit = (posts: any[]): Discussion[] =>
+const mapReddit = (posts: Record<string, unknown>[]): Discussion[] =>
   posts.map((post) => ({
-    title: post.data?.title as string,
+    title: (post.data as Record<string, unknown>)?.title as string,
     source: "Reddit r/programming",
     category: "General",
     summary:
@@ -71,15 +71,15 @@ export default function Discussions() {
 
         const hnData =
           hnRes.status === "fulfilled"
-            ? ((await hnRes.value.json()) as { hits?: any[] })
+            ? ((await hnRes.value.json()) as { hits?: Record<string, unknown>[] })
             : { hits: [] };
         const devtoData =
           devtoRes.status === "fulfilled"
-            ? ((await devtoRes.value.json()) as any[])
+            ? ((await devtoRes.value.json()) as Record<string, unknown>[])
             : [];
         const redditData =
           redditRes.status === "fulfilled"
-            ? (((await redditRes.value.json()) as any)?.data?.children as any[])
+            ? (((await redditRes.value.json()) as Record<string, unknown>)?.data?.children as Record<string, unknown>[])
             : [];
 
         const combined = [

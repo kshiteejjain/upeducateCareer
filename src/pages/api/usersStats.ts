@@ -12,7 +12,7 @@ export default async function handler(
   }
 
   const db = getDb();
-  const usersRef = collection(db, "users");
+  const usersRef = collection(db, "upEducatePlus");
   const snapshot = await getCountFromServer(usersRef);
 
   return res.status(200).json({ count: snapshot.data().count });

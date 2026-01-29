@@ -97,7 +97,7 @@ const formatDateDisplay = (value: string | undefined | null) => {
   return `${day}-${month}-${year}`;
 };
 
-const computeDeadlineFromDuration = (
+const _computeDeadlineFromDuration = (
   startDate: string,
   durationDays: number
 ) => {
@@ -139,7 +139,7 @@ export default function Projects() {
     void withLoader(fetchProjects, "Loading your workspace projects...");
   }, [withLoader]);
 
-  const aiQueue = useMemo(
+  const _aiQueue = useMemo(
     () => aiProjectTemplates.map((template) => ({ ...template })),
     []
   );

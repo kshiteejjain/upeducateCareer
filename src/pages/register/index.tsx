@@ -11,7 +11,7 @@ import { useLoader } from "@/components/Loader/LoaderProvider";
 
 const initialFormState: RegisterFormRecord = {
   ...createRecordFromSchema(registerFormSchema),
-  role: "faculty",
+  role: "teacher",
 };
 
 export default function Register() {
@@ -35,12 +35,11 @@ export default function Register() {
       name: formData.name,
       email: formData.email,
       password: formData.password,
-      subject: formData.role === "faculty" ? formData.subject : "",
+      mobileNumber: formData.mobileNumber,
       courseName: formData.role === "student" ? formData.courseName : "",
       courseDuration: formData.role === "student" ? formData.courseDuration : "",
       courseStartDate:
         formData.role === "student" ? formData.courseStartDate : "",
-      mobileNumber: formData.role === "student" ? formData.mobileNumber : "",
       createdAt: new Date().toISOString(),
     };
 
@@ -76,7 +75,7 @@ export default function Register() {
       {/* Left Section (Same visual as login) */}
       <div className={styles.leftSection}>
         <div className="overlay">
-          <h1 className={styles.brand}>Red and White</h1>
+          <h1 className={styles.brand}>upEducatePlus</h1>
           <p className={styles.tagline}>
             Join our vibrant learning community and unlock your potential.
           </p>
@@ -88,7 +87,7 @@ export default function Register() {
         <div className={styles.formContainer}>
           <h2 className={styles.heading}>Create Your Account</h2>
           <p className={styles.subHeading}>
-            Register to start your journey with Red and White
+            Register to start your journey with upEducatePlus
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -101,7 +100,7 @@ export default function Register() {
                 onChange={handleChange}
               >
                 {/* <option value="student">Student</option> */}
-                <option value="faculty">Faculty</option>
+                <option value="teacher">teacher</option>
               </select>
             </div>
 
@@ -113,6 +112,19 @@ export default function Register() {
                 className="form-control"
                 placeholder="Enter your full name"
                 value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Mobile Number:</label>
+              <input
+                type="tel"
+                name="mobileNumber"
+                className="form-control"
+                placeholder="Enter mobile number"
+                value={formData.mobileNumber}
                 onChange={handleChange}
                 required
               />
@@ -144,73 +156,8 @@ export default function Register() {
               />
             </div>
 
-            {formData.role === "faculty" && (
-              <div className="form-group">
-                <label>Subject:</label>
-                <input
-                  type="text"
-                  name="subject"
-                  className="form-control"
-                  placeholder="Enter subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            )}
-
             {formData.role === "student" && (
               <>
-                <div className="form-group">
-                  <label>Course Name:</label>
-                  <input
-                    type="text"
-                    name="courseName"
-                    className="form-control"
-                    placeholder="Enter course name"
-                    value={formData.courseName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Course Duration:</label>
-                  <input
-                    type="text"
-                    name="courseDuration"
-                    className="form-control"
-                    placeholder="e.g., 6 months"
-                    value={formData.courseDuration}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Course Start Date:</label>
-                  <input
-                    type="date"
-                    name="courseStartDate"
-                    className="form-control"
-                    value={formData.courseStartDate}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Mobile Number:</label>
-                  <input
-                    type="tel"
-                    name="mobileNumber"
-                    className="form-control"
-                    placeholder="Enter mobile number"
-                    value={formData.mobileNumber}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
               </>
             )}
 

@@ -1,4 +1,5 @@
 ﻿import { useMemo, useState, useRef } from "react";
+import Image from "next/image";
 import Layout from "@/components/Layout/Layout";
 import styles from "./ResumeBuilder.module.css";
 
@@ -197,11 +198,11 @@ export default function ResumeBuilder() {
     setForm(emptyState(tpl));
   };
 
-  const updateField = (key: keyof ResumeTemplate, value: any) => {
+  const updateField = (key: keyof ResumeTemplate, value: unknown) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const updateExperience = (index: number, key: keyof Experience, value: any) => {
+  const updateExperience = (index: number, key: keyof Experience, value: unknown) => {
     setForm((prev) => {
       const next = [...prev.experiences];
       next[index] = { ...next[index], [key]: value };
@@ -209,7 +210,7 @@ export default function ResumeBuilder() {
     });
   };
 
-  const updateEducation = (index: number, key: keyof Education, value: any) => {
+  const updateEducation = (index: number, key: keyof Education, value: unknown) => {
     setForm((prev) => {
       const next = [...prev.education];
       next[index] = { ...next[index], [key]: value };
@@ -217,7 +218,7 @@ export default function ResumeBuilder() {
     });
   };
 
-  const updateProject = (index: number, key: keyof ProjectItem, value: any) => {
+  const updateProject = (index: number, key: keyof ProjectItem, value: unknown) => {
     setForm((prev) => {
       const next = [...prev.projects];
       next[index] = { ...next[index], [key]: value };
@@ -553,7 +554,7 @@ export default function ResumeBuilder() {
                 <div className={styles.navySidebar}>
                   {form.photo && (
                     <div className={styles.photoCircle}>
-                      <img src={form.photo} alt="Profile" />
+                      <Image src={form.photo} alt="Profile" width={120} height={120} />
                     </div>
                   )}
                   <div className={styles.sidebarBlock}>

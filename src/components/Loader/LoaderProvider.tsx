@@ -2,7 +2,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -20,7 +19,8 @@ const LoaderContext = createContext<LoaderContextValue | null>(null);
 export function LoaderProvider({ children }: { children: React.ReactNode }) {
   const [pending, setPending] = useState(0);
 
-  const startLoading = useCallback((message?: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const startLoading = useCallback((_message?: string) => {
     setPending((count) => count + 1);
   }, []);
 

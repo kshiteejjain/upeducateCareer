@@ -34,15 +34,15 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Head>
         {/* 🌐 Basic Meta */}
-        <title>Red and White | AI Job Search | AI Interview</title>
+        <title>upEducatePlus | AI Job Search | AI Interview</title>
         <meta
           name="description"
-          content="Red and White empowers students and educators through innovative learning experiences."
+          content="upEducatePlus empowers students and educators through innovative learning experiences."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         {/* 🧩 Favicon & Icons */}
-        <link rel="icon" href="/favicon.webp" />
+        <link rel="icon" href="/favicon.png" />
         <link rel="manifest" href="/site.webmanifest" />
 
         {/* 🎨 Theme color for mobile browser UI */}

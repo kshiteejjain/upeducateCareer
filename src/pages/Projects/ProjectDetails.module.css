@@ -72,13 +72,13 @@
 .heroTitle {
   font-size: 30px;
   font-weight: 500;
-  color: var(--color-textGray);
+  color: var(--color-text);
   margin-bottom: 6px;
 }
 
 .heroSubtitle {
   font-size: 14px;
-  color: var(--color-textGray);
+  color: var(--color-text);
   line-height: 30px;
   max-width: 880px;
 }
@@ -96,7 +96,7 @@
 
 .metric span {
   font-size: 13px;
-  color: var(--color-textGray);
+  color: var(--color-text);
   letter-spacing: 0.1px;
 }
 
@@ -104,7 +104,7 @@
   display: block;
   margin-top: 6px;
   font-size: 14px;
-  color: var(--color-textGray);
+  color: var(--color-text);
   font-weight: 600;
 }
 
@@ -181,17 +181,17 @@
 
 .statusInProgress {
   background: var(--color-lightGray);
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .statusReview {
   background: var(--color-lightGray);
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .statusBacklog {
   background: var(--color-lightGray);
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .statusComplete {
@@ -563,7 +563,7 @@
 .emptyState h3 {
   font-size: 18px;
   margin-bottom: 8px;
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .emptyState p {

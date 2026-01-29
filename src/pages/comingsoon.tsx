@@ -1,7 +1,20 @@
 import Layout from "@/components/Layout/Layout";
-import React from "react";
+import React, { useState } from "react";
 
 export default function ComingSoon() {
+  // Generate random positions on mount to avoid impure function calls during render
+  const [animatedElements] = useState(() => {
+    return [...Array(12)].map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      fontSize: 20 + Math.random() * 30,
+      opacity: 0.1 + Math.random() * 0.3,
+      duration: 5 + Math.random() * 5,
+      delay: Math.random() * 5,
+    }));
+  });
+
   return (
     <Layout>
     <div
@@ -31,17 +44,17 @@ export default function ComingSoon() {
           zIndex: 0
         }}
       >
-        {[...Array(12)].map((_, i) => (
+        {animatedElements.map((elem) => (
           <span
-            key={i}
+            key={elem.id}
             style={{
               position: "absolute",
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              fontSize: `${20 + Math.random() * 30}px`,
-              opacity: 0.1 + Math.random() * 0.3,
-              animation: `float ${5 + Math.random() * 5}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 5}s`
+              left: `${elem.left}%`,
+              top: `${elem.top}%`,
+              fontSize: `${elem.fontSize}px`,
+              opacity: elem.opacity,
+              animation: `float ${elem.duration}s ease-in-out infinite`,
+              animationDelay: `${elem.delay}s`
             }}
           >
             🚀

@@ -11,6 +11,7 @@ export default function Navbar() {
   useEffect(() => {
     const segment = pathname.split("/").filter(Boolean).pop() || "";
     if (pathname === "/Projects/[id]") {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       setPageTitle("Project Details");
       return;
     }

@@ -4,11 +4,10 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { getDb } from "@/utils/firebase";
 
 type RegisterRequestBody = {
-  role?: "faculty" | "student";
+  role?: "teacher" | "student";
   name?: string;
   email?: string;
   password?: string;
-  subject?: string;
   courseName?: string;
   courseDuration?: string;
   courseStartDate?: string;
@@ -29,10 +28,6 @@ export default async function handler(
     name,
     email,
     password,
-    subject = "",
-    courseName = "",
-    courseDuration = "",
-    courseStartDate = "",
     mobileNumber = "",
   } = req.body as RegisterRequestBody;
 
@@ -44,7 +39,7 @@ export default async function handler(
 
   try {
     const db = getDb();
-    const userRef = doc(db, "users", email);
+    const userRef = doc(db, "upEducatePlusUsers", email);
     const existingUser = await getDoc(userRef);
 
     if (existingUser.exists()) {
@@ -57,11 +52,10 @@ export default async function handler(
       name,
       email,
       password,
-      subject: role === "faculty" ? subject : "",
-      courseName: role === "student" ? courseName : "",
-      courseDuration: role === "student" ? courseDuration : "",
-      courseStartDate: role === "student" ? courseStartDate : "",
-      mobileNumber: role === "student" ? mobileNumber : "",
+      mobileNumber: mobileNumber,
+      courseName: role === "student" ? (req.body as RegisterRequestBody).courseName : "",
+      courseDuration: role === "student" ? (req.body as RegisterRequestBody).courseDuration : "",
+      courseStartDate: role === "student" ? (req.body as RegisterRequestBody).courseStartDate : "",
       createdAt: serverTimestamp(),
     });
 

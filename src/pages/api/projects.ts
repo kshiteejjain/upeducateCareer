@@ -61,14 +61,14 @@ function serializeProject(data: Partial<Project>, id: string): Project {
   const createdAt =
     typeof data.createdAt === "string"
       ? data.createdAt
-      : data.createdAt && typeof (data.createdAt as any).toDate === "function"
-      ? (data.createdAt as any).toDate().toISOString()
+      : data.createdAt && typeof (data.createdAt as Record<string, unknown>).toDate === "function"
+      ? ((data.createdAt as Record<string, unknown>).toDate as () => Date)().toISOString()
       : undefined;
 
   const normalizeDateField = (value: unknown) => {
     if (typeof value === "string") return value;
-    if (value && typeof (value as any).toDate === "function") {
-      return (value as any).toDate().toISOString().slice(0, 10);
+    if (value && typeof (value as Record<string, unknown>).toDate === "function") {
+      return ((value as Record<string, unknown>).toDate as () => Date)().toISOString().slice(0, 10);
     }
     return value ? String(value) : "";
   };
@@ -89,7 +89,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const db = getDb();
-  const projectsRef = collection(db, "projects");
+  const projectsRef = collection(db, "upEducatePlus");
   const projectId =
     typeof req.query.id === "string"
       ? req.query.id

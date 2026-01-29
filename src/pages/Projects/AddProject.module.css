@@ -118,7 +118,7 @@
   padding: 6px 10px;
   border-radius: 999px;
   background: var(--color-lightGray);
-  color: var(--color-textGray);
+  color: var(--color-text);
   font-weight: 500;
   white-space: nowrap;
   margin-left: 8px;
@@ -132,12 +132,12 @@
 
 .statusInProgress {
   background: var(--color-lightGray);
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .statusBacklog {
   background: var(--color-lightGray);
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .statusReview {
@@ -243,7 +243,7 @@
 .cardValue {
   font-size: 13px;
   font-weight: 500;
-  color: var(--color-textGray);
+  color: var(--color-text);
 }
 
 .viewButton {
@@ -284,7 +284,7 @@
   color: var(--color-white) !important;
   border-radius: 5px !important;
   padding: 8px 10px !important;
-  box-shadow: 0 10px 22px var(--color-textGray);
+  box-shadow: 0 10px 22px var(--color-text);
   font-size: 12px !important;
 }
 

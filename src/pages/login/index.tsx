@@ -73,10 +73,10 @@ export default function Login() {
       {/* Left Red Image Section */}
       <div className={styles.leftSection}>
         <div className="overlay">
-          <h1 className={styles.brand}>Red and White</h1>
+          <h1 className={styles.brand}>upEducate Plus</h1>
           <p className={styles.tagline}>
-            Learn like top IITians & achieve Professional Jobs <br /> Trusted by
-            1500+ Placement Partners
+            Your AI-powered career companion delivering skills, mentorship,
+            and opportunities for professional growth
           </p>
         </div>
       </div>
@@ -130,13 +130,13 @@ export default function Login() {
           </form>
 
           <div className={styles.divider}>
-            <span>New to Red and White?</span>
+            <span>New to upEducatePlus?</span>
           </div>
 
           <button
-            className={styles.createAccountButton}
             onClick={handleCreateAccount}
             disabled={isLoading}
+            className="btn-secondary"
           >
             Create Account
           </button>

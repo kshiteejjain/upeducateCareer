@@ -3,7 +3,7 @@ import styles from "./Table.module.css";
 
 interface TableProps {
   headers: string[];
-  data: any[];
+  data: Record<string, unknown>[];
   enableStatusFilter?: boolean;
 }
 
@@ -19,7 +19,7 @@ export default function Table({
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const perPage = 10;
 
-  const getComparableValue = (row: any, header: string) => {
+  const getComparableValue = (row: Record<string, unknown>, header: string) => {
     const value = row[header] ?? row[header.toLowerCase()];
     if (typeof value === "number") return value;
     if (typeof value === "string") return value.toLowerCase();
@@ -72,10 +72,11 @@ export default function Table({
   const paginated = sorted.slice((page - 1) * perPage, page * perPage);
 
   useEffect(() => {
-    if (page > totalPages) {
+    if (page > totalPages && totalPages > 0) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       setPage(totalPages);
     }
-  }, [page, totalPages]);
+  }, [page, totalPages, setPage]);
 
   const pageNumbers = useMemo(
     () => Array.from({ length: totalPages }, (_, i) => i + 1),

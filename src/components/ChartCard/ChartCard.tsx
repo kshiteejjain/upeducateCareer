@@ -27,7 +27,7 @@ Chart.register(
 interface ChartCardProps {
   title: string;
   type: "bar" | "pie";
-  data: any;
+  data: Record<string, unknown>;
 }
 
 export default function ChartCard({ title, type, data }: ChartCardProps) {

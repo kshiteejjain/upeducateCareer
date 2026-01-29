@@ -29,7 +29,7 @@ export default async function handler(
   }
 
   const db = getDb();
-  const userRef = doc(db, "users", email);
+  const userRef = doc(db, "upEducatePlus", email);
 
   if (req.method === "GET") {
     const snap = await getDoc(userRef);

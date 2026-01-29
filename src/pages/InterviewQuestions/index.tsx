@@ -18,12 +18,11 @@ export default function InterviewQuestions() {
   const [category, setCategory] = useState<CategoryType | "all">(
     initialAttempt.category as CategoryType | "all"
   );
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Record<string, unknown>[]>([]);
   const [answers, setAnswers] = useState<Record<number, string>>(
     initialAttempt.answers
   );
   const [score, setScore] = useState<number | null>(initialAttempt.score);
-  const [username, setUsername] = useState(initialAttempt.username);
 
   useEffect(() => {
     const all = Object.values(questionsData).flat();
@@ -186,7 +185,7 @@ export default function InterviewQuestions() {
             <span className={styles.medal}>
               {isHighScore ? "🏆" : percent >= 50 ? "🎯" : "💪"}
             </span>
-            {username || "Candidate"}'s Score Card
+            {username || "Candidate"}&apos;s Score Card
           </h3>
 
           {/* Stats Cards */}

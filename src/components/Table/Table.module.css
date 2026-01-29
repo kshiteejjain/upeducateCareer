@@ -25,19 +25,19 @@
   white-space: nowrap;
 }
 .td {
-  border: 1px solid var(--color-lightGray);
+  border: 1px solid var(--color-blue-gray);
   padding: 10px;
   font-size: 13px;
   font-weight: normal;
-  color: var(--color-textGray);
+  color: var(--color-text);
   background-color: var(--color-white);
 }
 .th{
-  border: 1px solid var(--color-lightGray);
+  border: 1px solid var(--color-blue-gray);
   padding: 10px;
   font-size: 13px;
   font-weight: bold;
-  color: var(--color-textGray);
+  color: var(--color-text);
   background-color: var(--color-white);
 }
 .sortable {
@@ -59,7 +59,7 @@
   min-width: 36px;
   border: 1px solid var(--color-gray);
   background: var(--color-white);
-  color: var(--color-textGray);
+  color: var(--color-text);
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
@@ -79,6 +79,6 @@
 
 .pageButton:disabled {
   background: var(--color-ccc);
-  color: var(--color-textGray);
+  color: var(--color-text);
   cursor: not-allowed;
 }

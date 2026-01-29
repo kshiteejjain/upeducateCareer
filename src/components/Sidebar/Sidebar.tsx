@@ -6,15 +6,16 @@ import { getSession } from "@/utils/authSession";
 import styles from "./Sidebar.module.css";
 
 const menuItems = [
-  { name: "Dashboard", path: "/Dashboard" },
-  { name: 'Projects', path: "/Projects" },
-  { name: "View Jobs", path: "/ViewJobs" },
-  { name: "Interview Preparation", path: "/InterviewQuestions" },
-  { name: "Professional Resume", path: "/ResumeBuilder" },
-  { name: "AI Mock Interview", path: "/comingsoon" },
-  { name: "Discussions", path: "/Discussions" },
-  { name: "Mentorship", path: "/Mentorship" },
-  { name: "Bulk Upload", path: "/Upload" },
+  { name: "Dashboard", path: "/Dashboard", icon: "📊" },
+  { name: "Job Search", path: "/Projects", icon: "🔍" },
+  { name: "Job Board", path: "/ViewJobs", icon: "🗂️" },
+  { name: "Resume Builder", path: "/ResumeBuilder", icon: "📄" },
+  { name: "LinkedIn Profile Analysis", path: "/LinkedinAnalysis", icon: "🔗" },
+  { name: "Schedule 1:1 Meet", path: "/Mentorship", icon: "📅" },
+  { name: "Assessment", path: "/", icon: "📝" },
+  { name: "AI Interview", path: "/InterviewQuestions", icon: "🤖" },
+  { name: "Discussions", path: "/Discussions", icon: "💬" },
+  { name: "Bulk Upload", path: "/Upload", icon: "📤" }
 ];
 
 export default function Sidebar() {
@@ -24,14 +25,17 @@ export default function Sidebar() {
 
   useEffect(() => {
     const session = getSession();
-    setUserRole(session?.role ?? null);
+    if (session?.role) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setUserRole(session.role);
+    }
   }, []);
 
   const visibleItems = useMemo(
     () =>
       menuItems.filter(
         (item) =>
-          item.name !== "Upload" || (userRole ?? "").toLowerCase() === "faculty"
+          item.name !== "Upload" || (userRole ?? "").toLowerCase() === "teacher"
       ),
     [userRole]
   );
@@ -39,7 +43,7 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
-        <Image src="/logo.webp" alt="Logo" width={128} height={30} priority />
+        <Image src="/logo.svg" alt="Logo" width={200} height={48} priority />
       </div>
 
       <ul className={styles.menuList}>
@@ -53,7 +57,7 @@ export default function Sidebar() {
               key={item.name}
               className={`${styles.menuItem} ${isActive ? styles.active : ""}`}
             >
-              <Link href={item.path}>{item.name}</Link>
+              <Link href={item.path}> {item.icon} {item.name}</Link>
             </li>
           );
         })}

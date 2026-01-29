@@ -174,7 +174,7 @@ export default function ProjectDetails() {
     setEditTechInput("");
   }, [project]);
 
-  const isFaculty = sessionUser?.role === "faculty";
+  const isteacher = sessionUser?.role === "teacher";
 
   const handleEditChange = (
     event:
@@ -298,8 +298,8 @@ export default function ProjectDetails() {
   const handleEditSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!project) return;
-    if (!isFaculty) {
-      toast.error("Only faculty members can edit projects.");
+    if (!isteacher) {
+      toast.error("Only teacher members can edit projects.");
       return;
     }
 
@@ -396,8 +396,8 @@ export default function ProjectDetails() {
 
   const handleDeleteProject = async () => {
     if (!project) return;
-    if (!isFaculty) {
-      toast.error("Only faculty members can delete projects.");
+    if (!isteacher) {
+      toast.error("Only teacher members can delete projects.");
       return;
     }
     setConfirmState({ type: "delete" });
@@ -431,8 +431,8 @@ export default function ProjectDetails() {
 
   const handleRemoveParticipant = async (member: string) => {
     if (!project) return;
-    if (!isFaculty) {
-      toast.error("Only faculty members can manage the team.");
+    if (!isteacher) {
+      toast.error("Only teacher members can manage the team.");
       return;
     }
 
@@ -505,7 +505,7 @@ export default function ProjectDetails() {
             </p>
           </div>
           <div className={headerStyles.actions}>
-            {isFaculty && project ? (
+            {isteacher && project ? (
               <>
                 <button
                   type="button"
@@ -734,7 +734,7 @@ export default function ProjectDetails() {
                                   {note?.contribution ||
                                     "No contribution note added yet."}
                                 </p>
-                                {isFaculty ? (
+                                {isteacher ? (
                                   <button
                                     type="button"
                                     className={styles.teamRemove}
@@ -1037,7 +1037,7 @@ export default function ProjectDetails() {
               </div>
 
               <div className={styles.noticeBox}>
-                Note: Once you join the team, you cannot leave without approval from the project owner and faculty.
+                Note: Once you join the team, you cannot leave without approval from the project owner and teacher.
               </div>
 
               <div className={headerStyles.formFooter}>
