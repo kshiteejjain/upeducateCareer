@@ -12,21 +12,37 @@ import {
 } from "@/utils/schemaUtils";
 import { interviewAttemptSchema } from "@/utils/formSchemas";
 
+type Question = {
+  type: "mcq" | "text" | "short";
+  category: string;
+  question: string;
+  answer: string;
+  options?: string[];
+};
+type QuestionsData = Record<string, Question[]>;
+
+const typedQuestionsData = questionsData as QuestionsData;
+
 export default function InterviewQuestions() {
   type CategoryType = keyof typeof questionsData;
   const initialAttempt = createRecordFromSchema(interviewAttemptSchema);
   const [category, setCategory] = useState<CategoryType | "all">(
     initialAttempt.category as CategoryType | "all"
   );
-  const [questions, setQuestions] = useState<Record<string, unknown>[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<number, string>>(
     initialAttempt.answers
   );
   const [score, setScore] = useState<number | null>(initialAttempt.score);
+  const [username, setUsername] = useState<string>(
+    (initialAttempt.username as string) || ""
+  );
 
   useEffect(() => {
-    const all = Object.values(questionsData).flat();
-    setQuestions(category === "all" ? all : questionsData[category] || []);
+    const all = Object.values(typedQuestionsData).flat();
+    setQuestions(
+      category === "all" ? all : typedQuestionsData[category] || []
+    );
     setScore(null);
     setAnswers({});
   }, [category]);
@@ -86,6 +102,14 @@ export default function InterviewQuestions() {
       </section>
 
       <form className={styles.formGroup}>
+        <label htmlFor="usernameInput">Your Name:</label>
+        <input
+          id="usernameInput"
+          className={styles.textInput}
+          placeholder="Enter your name"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
         <label htmlFor="categorySelect">Filter by Category:</label>
         <select
           value={category}
@@ -110,7 +134,7 @@ export default function InterviewQuestions() {
 
               {q.type === "mcq" && (
                 <div className={styles.options}>
-                  {q.options.map((opt: string, idx: number) => (
+                  {q.options?.map((opt: string, idx: number) => (
                     <label key={idx} className={styles.option}>
                       <input
                         type="radio"

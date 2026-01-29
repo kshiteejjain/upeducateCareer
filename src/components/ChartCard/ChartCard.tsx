@@ -10,6 +10,8 @@ import {
   Tooltip,
   Legend,
   ChartData,
+  ChartConfiguration,
+  ChartOptions,
 } from "chart.js";
 import styles from "./ChartCard.module.css";
 
@@ -41,7 +43,7 @@ export default function ChartCard({ title, type, data }: ChartCardProps) {
     // Destroy existing chart before creating a new one (to prevent memory leaks)
     if (chartInstance.current) chartInstance.current.destroy();
 
-    const baseOptions = {
+    const baseOptions: ChartOptions<"bar" | "pie"> = {
       plugins: {
         legend: { display: type === "pie" },
       },
@@ -49,7 +51,7 @@ export default function ChartCard({ title, type, data }: ChartCardProps) {
       maintainAspectRatio: false,
     };
 
-    const barOptions =
+    const barOptions: ChartOptions<"bar" | "pie"> =
       type === "bar"
         ? {
             ...baseOptions,
@@ -65,11 +67,13 @@ export default function ChartCard({ title, type, data }: ChartCardProps) {
           }
         : baseOptions;
 
-    chartInstance.current = new Chart(canvasRef.current, {
+    const config: ChartConfiguration<"bar" | "pie"> = {
       type,
       data,
       options: barOptions,
-    });
+    };
+
+    chartInstance.current = new Chart(canvasRef.current, config);
   }, [data, type]);
 
   return (

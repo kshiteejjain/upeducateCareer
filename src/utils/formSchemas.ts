@@ -27,7 +27,7 @@ export const registerFormSchema: Schema<RegisterFormRecord> = {
 };
 
 export type RegisterRecord = {
-  role: "teacher";
+  role: "teacher" | "student";
   name: string;
   email: string;
   password: string;

@@ -43,7 +43,12 @@ const mapRemoteOK = (data: Record<string, unknown>[]): JobItem[] => {
     postedAt: (job.date as string) ?? (job.created_at as string) ?? "",
     platform: "RemoteOK",
     status: (job.closed as boolean) ? "Closed" : "Open",
-    applyUrl: job.url ?? job.apply_url ?? "#",
+    applyUrl:
+      typeof job.url === "string"
+        ? job.url
+        : typeof job.apply_url === "string"
+        ? job.apply_url
+        : "#",
   }));
 };
 
@@ -60,15 +65,21 @@ export default async function handler(
 
     const remoteOkUrl = new URL("https://remoteok.com/api");
 
-    const results = await Promise.allSettled([
-      fetchJson(remotiveUrl.toString()),
-      fetchJson(remoteOkUrl.toString(), { "User-Agent": "RedNWhiteJobs/1.0" }),
-    ]);
+    const [remotiveResult, remoteOkResult] = await Promise.allSettled([
+      fetchJson<Record<string, unknown>>(remotiveUrl.toString()),
+      fetchJson<Record<string, unknown>[]>(remoteOkUrl.toString(), {
+        "User-Agent": "RedNWhiteJobs/1.0",
+      }),
+    ] as const);
 
     const remotive =
-      results[0].status === "fulfilled" ? mapRemotive(results[0].value) : [];
+      remotiveResult.status === "fulfilled"
+        ? mapRemotive(remotiveResult.value)
+        : [];
     const remoteOk =
-      results[1].status === "fulfilled" ? mapRemoteOK(results[1].value) : [];
+      remoteOkResult.status === "fulfilled"
+        ? mapRemoteOK(remoteOkResult.value)
+        : [];
 
     const combined = [...remotive, ...remoteOk].filter(
       (job) => job.applyUrl && job.applyUrl !== "#"

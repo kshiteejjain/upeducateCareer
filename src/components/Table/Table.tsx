@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { ReactNode, isValidElement, useEffect, useMemo, useState } from "react";
 import styles from "./Table.module.css";
 
 interface TableProps {
@@ -18,6 +18,18 @@ export default function Table({
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const perPage = 10;
+
+  const toCellContent = (value: unknown): ReactNode => {
+    if (value === null || value === undefined) return "";
+    if (isValidElement(value)) return value;
+    if (value instanceof Date) return value.toLocaleString();
+    if (typeof value === "string") return value;
+    if (typeof value === "number" || typeof value === "boolean") {
+      return String(value);
+    }
+    if (Array.isArray(value)) return value.join(", ");
+    return JSON.stringify(value);
+  };
 
   const getComparableValue = (row: Record<string, unknown>, header: string) => {
     const value = row[header] ?? row[header.toLowerCase()];
@@ -125,7 +137,7 @@ export default function Table({
             <tr className={styles.tr} key={i}>
               {headers.map((header, j) => (
                 <td className={styles.td} key={j}>
-                  {row[header] ?? row[header.toLowerCase()] ?? ""}
+                  {toCellContent(row[header] ?? row[header.toLowerCase()])}
                 </td>
               ))}
             </tr>

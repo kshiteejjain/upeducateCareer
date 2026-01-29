@@ -16,6 +16,12 @@ type FetchState = {
   error: string | null;
 };
 
+type RedditListing = {
+  data?: {
+    children?: Record<string, unknown>[];
+  };
+};
+
 const mapHackerNews = (hits: Record<string, unknown>[]): Discussion[] =>
   hits
     .filter((hit) => hit?.title)
@@ -43,15 +49,24 @@ const mapDevTo = (articles: Record<string, unknown>[]): Discussion[] =>
   }));
 
 const mapReddit = (posts: Record<string, unknown>[]): Discussion[] =>
-  posts.map((post) => ({
-    title: (post.data as Record<string, unknown>)?.title as string,
-    source: "Reddit r/programming",
-    category: "General",
-    summary:
-      (post.data?.selftext?.slice(0, 140) as string | undefined) ||
-      "Popular in r/programming",
-    link: post.data?.url || `https://reddit.com${post.data?.permalink}`,
-  }));
+  posts.map((post) => {
+    const postData = post.data as Record<string, unknown> | undefined;
+    const selftext = postData?.selftext;
+    const url = postData?.url;
+    const permalink = postData?.permalink;
+
+    return {
+      title: (postData?.title as string) ?? "",
+      source: "Reddit r/programming",
+      category: "General",
+      summary:
+        (typeof selftext === "string" ? selftext.slice(0, 140) : undefined) ||
+        "Popular in r/programming",
+      link:
+        (typeof url === "string" ? url : undefined) ||
+        `https://reddit.com${typeof permalink === "string" ? permalink : ""}`,
+    };
+  });
 
 export default function Discussions() {
   const [state, setState] = useState<FetchState>({ items: [], error: null });
@@ -77,10 +92,11 @@ export default function Discussions() {
           devtoRes.status === "fulfilled"
             ? ((await devtoRes.value.json()) as Record<string, unknown>[])
             : [];
-        const redditData =
+        const redditListing =
           redditRes.status === "fulfilled"
-            ? (((await redditRes.value.json()) as Record<string, unknown>)?.data?.children as Record<string, unknown>[])
-            : [];
+            ? ((await redditRes.value.json()) as RedditListing)
+            : undefined;
+        const redditData = redditListing?.data?.children ?? [];
 
         const combined = [
           ...mapHackerNews(hnData.hits ?? []),
@@ -140,7 +156,7 @@ export default function Discussions() {
             <h3 className={styles.cardTitle}>{discussion.title}</h3>
             <p className={styles.summary}>{discussion.summary}</p>
             <div className={styles.footer}>
-              <span className={styles.linkHint}>Open discussion →</span>
+              <span className={styles.linkHint}>Open discussion -&gt;</span>
             </div>
           </a>
         ))}
