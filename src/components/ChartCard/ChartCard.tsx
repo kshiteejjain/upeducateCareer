@@ -9,6 +9,7 @@ import {
   ArcElement,
   Tooltip,
   Legend,
+  ChartData,
 } from "chart.js";
 import styles from "./ChartCard.module.css";
 
@@ -27,12 +28,12 @@ Chart.register(
 interface ChartCardProps {
   title: string;
   type: "bar" | "pie";
-  data: Record<string, unknown>;
+  data: ChartData<"bar" | "pie">;
 }
 
 export default function ChartCard({ title, type, data }: ChartCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chartInstance = useRef<Chart | null>(null);
+  const chartInstance = useRef<Chart<"bar" | "pie"> | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
