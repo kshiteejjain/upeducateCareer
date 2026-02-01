@@ -85,11 +85,6 @@
   margin-top: 15px;
 }
 
-.forgotPasswordLink{
-  font-size: calc(var(--font-size-base) - 2px);
-  cursor: pointer;
-}
-
 .forgotPassword:hover {
   text-decoration: underline;
 }
@@ -159,16 +154,6 @@
   color: var(--color-text);
   text-align: center;
   margin-top: 15px;
-}
-
-.link {
-  color: var(--color-secondary);
-  text-decoration: none;
-  transition: 0.3s;
-}
-
-.link:hover {
-  text-decoration: underline;
 }
 
 .helperNote {

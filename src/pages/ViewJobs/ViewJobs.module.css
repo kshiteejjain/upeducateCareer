@@ -2,9 +2,114 @@
   padding: 20px;
   background: var(--color-f8f9fa);
 }
-.jobInfo{
+
+.jobInfo {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   margin-bottom: 10px;
+}
+
+.searchForm {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+  gap: 16px;
+  align-items: end;
+  margin: 20px 0;
+  padding: 16px;
+  background: var(--color-white);
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.searchField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.searchField label {
+  font-weight: 600;
+  color: var(--color-black);
+}
+
+.input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 113, 197, 0.15);
+}
+
+.btnLink {
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  padding: 8px 10px;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.searchButton {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 113, 197, 0.25);
+}
+
+.emptyState {
+  margin: 32px auto;
+  padding: 32px 24px;
+  width: 100%;
+  background: var(--color-white);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.emptyState h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--color-black);
+}
+
+.emptyState p {
+  margin: 0;
+  color: var(--color-text);
+}
+
+.emptyStateImage {
+  width: 400px;
+  height: auto;
+  margin: 0 auto;
+}
+
+
+@media (max-width: 900px) {
+  .searchForm {
+    grid-template-columns: 1fr;
+  }
+
+  .searchButton {
+    width: 100%;
+  }
 }

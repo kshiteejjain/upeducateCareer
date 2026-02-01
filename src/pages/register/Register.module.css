@@ -165,16 +165,6 @@
   margin-top: 15px;
 }
 
-.link {
-  color: var(--color-secondary);
-  text-decoration: none;
-  transition: 0.3s;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
 /* ---------- ANIMATIONS ---------- */
 @keyframes slideInLeft {
   from {

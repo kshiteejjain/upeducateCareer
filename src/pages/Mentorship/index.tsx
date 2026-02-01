@@ -21,7 +21,7 @@ const MENTORS = [
     expertise: ["Entrepreneurship", "Portfolio Management", "Training", "Wealth Management"],
     experience: "10+ Years",
     avatar: "👤",
-    photo: "https://media.licdn.com/dms/image/v2/D4D03AQH9ngclnEsJzA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1693374233744?e=1771459200&v=beta&t=YW5aY0VmaLuG8mSRqRVGKGVPhyKH5OwkJQqfB4gu5l8",
+    photo: "/ankush-bhandari.jpg",
     color: "gradient-blue",
     rating: 4.9,
     reviews: 145,

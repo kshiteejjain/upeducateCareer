@@ -19,11 +19,10 @@ type MappedUser = {
   password: string;
   role: "student";
   mobileNumber: string;
-  courseName: string;
-  courseDuration: string;
-  courseStartDate: string;
   subject: string;
+  board: string;
   createdAt: string;
+  registeredAt: string;
 };
 
 const normalizeKey = (value: string) =>
@@ -128,22 +127,8 @@ const parseCsv = (text: string): MappedUser[] => {
 
       const firstName = getField(record, ["first_name", "firstname"]).trim();
       const lastName = getField(record, ["last_name", "lastname"]).trim();
-      const courseName = getField(record, ["package_name", "packagename"]).trim();
-      const courseDuration = getField(record, [
-        "course duration",
-        "course_duration",
-        "courseduration",
-        "duration",
-      ]).trim();
-      const courseStartDate = getField(record, [
-        "start date",
-        "start_date",
-        "startdate",
-        "course start date",
-        "course_start_date",
-        "coursestartdate",
-      ]).trim();
       const name = [firstName, lastName].filter(Boolean).join(" ").trim();
+      const createdAt = formatTimestampIST();
 
       return {
         userId: generateClientUuid(),
@@ -152,11 +137,10 @@ const parseCsv = (text: string): MappedUser[] => {
         password: "apple@123",
         role: "student",
         mobileNumber: "",
-        courseName,
-        courseDuration,
-        courseStartDate,
         subject: "",
-        createdAt: formatTimestampIST(),
+        board: "",
+        createdAt,
+        registeredAt: createdAt,
       };
     })
     .filter((user): user is MappedUser => Boolean(user));
@@ -283,9 +267,7 @@ export default function UploadUsers() {
 
           <div className={styles.hint}>
             <strong>Required CSV headers:</strong>{" "}
-            <code>email</code>, <code>first_name</code>, <code>last_name</code>,{" "}
-            <code>course duration</code>, <code>package_name</code>,{" "}
-            <code>Start Date</code>
+            <code>email</code>, <code>first_name</code>, <code>last_name</code>
           </div>
         </section>
 
@@ -320,11 +302,10 @@ export default function UploadUsers() {
                     <th>password</th>
                     <th>role</th>
                     <th>mobileNumber</th>
-                    <th>courseName</th>
-                    <th>courseDuration</th>
-                    <th>courseStartDate</th>
                     <th>subject</th>
+                    <th>board</th>
                     <th>createdAt</th>
+                    <th>registeredAt</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -337,11 +318,10 @@ export default function UploadUsers() {
                       <td>{user.password}</td>
                       <td>{user.role}</td>
                       <td>{user.mobileNumber || "—"}</td>
-                      <td>{user.courseName || "—"}</td>
-                      <td>{user.courseDuration || "—"}</td>
-                      <td>{user.courseStartDate || "—"}</td>
                       <td>{user.subject || "—"}</td>
+                      <td>{user.board || "—"}</td>
                       <td>{user.createdAt}</td>
+                      <td>{user.registeredAt}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -14,9 +14,6 @@ type Member = {
   email?: string;
   role?: string;
   mobileNumber?: string;
-  courseName?: string;
-  courseDuration?: string;
-  courseStartDate?: string;
   createdAt?: string;
   subject?: string;
   status?: string;

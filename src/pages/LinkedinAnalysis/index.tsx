@@ -22,130 +22,27 @@ type AnalysisResult = {
   profileScore: number;
   profileUrl: string;
   sections: AnalysisSection[];
-};
-
-const mockAnalysisData: AnalysisResult = {
-  profileScore: 56.75,
-  profileUrl: "https://www.linkedin.com/in/kshiteejjain/",
-  sections: [
-    {
-      title: "Headline",
-      icon: "🎯",
-      color: "blue",
-      items: [
-        {
-          type: "positive",
-          text: "The headline lists multiple skills such as AI, Front End, React, and Next.js, which is good for keyword optimization.",
-          scoreImpact: 3,
-        },
-        {
-          type: "negative",
-          text: "The headline is cluttered and includes too many keywords, reducing clarity and focus.",
-          scoreImpact: 4,
-          suggestion: "Replace with a concise, targeted headline like: 'AI & Front End Engineer | React, Next.js | Micro Frontend | Generative AI Specialist'",
-        },
-      ],
-    },
-    {
-      title: "Summary / About",
-      icon: "📝",
-      color: "yellow",
-      items: [
-        {
-          type: "positive",
-          text: "The summary highlights extensive front-end and AI expertise, including certifications and diverse domains.",
-          scoreImpact: 3,
-        },
-        {
-          type: "negative",
-          text: "The summary is lengthy and lacks clear focus on key achievements or impact metrics.",
-          scoreImpact: 4,
-          suggestion: "Replace with a sharper, results-oriented summary emphasizing key achievements, technologies used, and domain expertise.",
-        },
-      ],
-    },
-    {
-      title: "Experience",
-      icon: "💼",
-      color: "blue",
-      items: [
-        {
-          type: "positive",
-          text: "The experience entries are detailed, showcasing leadership and technical roles across notable companies.",
-          scoreImpact: 4,
-        },
-        {
-          type: "negative",
-          text: "The descriptions are dense and could benefit from clearer formatting and focus on quantifiable achievements.",
-          scoreImpact: 4,
-          suggestion: "Replace with concise, achievement-focused bullet points with metrics like project scales, technologies used, and outcomes.",
-        },
-      ],
-    },
-    {
-      title: "Skills",
-      icon: "⚡",
-      color: "green",
-      items: [
-        {
-          type: "positive",
-          text: "The skills list is rich and comprehensive, including React, Generative AI, LangChain, and more important keywords.",
-          scoreImpact: 2,
-        },
-        {
-          type: "negative",
-          text: "Lacks endorsements or prioritization to highlight key skills.",
-          scoreImpact: 3,
-          suggestion: "Arrange skills by relevance to your target roles, and seek endorsements for top skills. Add skill levels if possible.",
-        },
-      ],
-    },
-    {
-      title: "Activity & Engagement",
-      icon: "📢",
-      color: "purple",
-      items: [
-        {
-          type: "negative",
-          text: "Profile shows no recent activity or posts, missing opportunity to demonstrate thought leadership.",
-          scoreImpact: 4,
-          suggestion: "Start sharing insights on AI, React projects, or industry trends to improve visibility. Even 1-2 posts/month can boost engagement.",
-        },
-      ],
-    },
-    {
-      title: "Final Suggestions",
-      icon: "🚀",
-      color: "pink",
-      items: [
-        {
-          type: "suggestion",
-          text: "Refine your headline to be concise and focused; include primary keywords aligned with your target roles.",
-          scoreImpact: 4,
-        },
-        {
-          type: "suggestion",
-          text: "Transform your summary into a clear, achievement-oriented narrative highlighting your impact and domain expertise.",
-          scoreImpact: 4,
-        },
-        {
-          type: "suggestion",
-          text: "Enhance your experience section with quantified accomplishments and clearer formatting to showcase leadership and technical success.",
-          scoreImpact: 4,
-        },
-        {
-          type: "suggestion",
-          text: "Prioritize and endorse key skills, and reorder skills for relevance to improve searchability and recruiter relevance.",
-          scoreImpact: 3,
-        },
-        {
-          type: "suggestion",
-          text: "Increase activity by posting and engaging in industry discussions to build thought leadership and visibility.",
-          scoreImpact: 4,
-        },
-      ],
-    },
-  ],
+  profileData: {
+    profileUrl?: string;
+    headline?: string;
+    summary?: string;
+    experience?: string;
+    skills?: string[];
+    education?: string;
+    profileText?: string;
+  };
+  aiAnalysis?: {
+    aiScore: number;
+    scoreRationale: string;
+    recommendations: string[];
+    modifications: {
+      headline?: string;
+      about?: string;
+      experienceBullets?: string[];
+      skills?: string[];
+    };
+    suggestedKeywords: string[];
+  };
 };
 
 export default function LinkedinAnalysis() {
@@ -166,27 +63,61 @@ export default function LinkedinAnalysis() {
 
     setIsLoading(true);
 
-    // Simulate API call - Replace with actual API endpoint
     const analyzeProfile = async () => {
       try {
-        // For now, using mock data. Replace with actual API call:
-        // const response = await fetch('/api/analyzeLinkedin', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ profileUrl: linkedinUrl })
-        // });
-        // const data = await response.json();
-        // setAnalysisResult(data);
+        const response = await fetch("/api/linkedinAnalysis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ profileUrl: linkedinUrl }),
+        });
+        const baseData = (await response.json()) as
+          | (Omit<AnalysisResult, "profileScore" | "aiAnalysis"> & { message?: string })
+          | { message?: string };
+        if (!response.ok) {
+          throw new Error(
+            "message" in baseData ? baseData.message || "Failed to analyze profile." : ""
+          );
+        }
 
-        // Using mock data for demonstration
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const aiResponse = await fetch("/api/linkedinAiAnalysis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            profileData: (baseData as AnalysisResult).profileData,
+            sections: (baseData as AnalysisResult).sections,
+          }),
+        });
+        const aiData = (await aiResponse.json()) as {
+          message?: string;
+          aiScore?: number;
+          scoreRationale?: string;
+          recommendations?: string[];
+          modifications?: {
+            headline?: string;
+            about?: string;
+            experienceBullets?: string[];
+            skills?: string[];
+          };
+          suggestedKeywords?: string[];
+        };
+        if (!aiResponse.ok) {
+          throw new Error(aiData?.message || "Failed to analyze profile with AI.");
+        }
+
         setAnalysisResult({
-          ...mockAnalysisData,
-          profileUrl: linkedinUrl,
+          ...(baseData as AnalysisResult),
+          profileScore: aiData.aiScore ?? 0,
+          aiAnalysis: {
+            aiScore: aiData.aiScore ?? 0,
+            scoreRationale: aiData.scoreRationale ?? "",
+            recommendations: aiData.recommendations ?? [],
+            modifications: aiData.modifications ?? {},
+            suggestedKeywords: aiData.suggestedKeywords ?? [],
+          },
         });
       } catch (err) {
-        setError("Failed to analyze profile. Please try again.");
-        console.error(err);
+        setError(err instanceof Error ? err.message : "Failed to analyze profile.");
+        console.error("LinkedIn analysis failed", err);
       } finally {
         setIsLoading(false);
       }
@@ -258,6 +189,7 @@ export default function LinkedinAnalysis() {
                     style={{ color: getScoreColor(analysisResult.profileScore) }}
                   >
                     {analysisResult.profileScore}
+                    {analysisResult.profileScore > 50 && " ❤️"}
                   </span>
                   <span className={styles.scoreMax}>/100</span>
                 </div>
@@ -273,6 +205,23 @@ export default function LinkedinAnalysis() {
                   </Link>
                 </div>
               </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className={styles.summaryGrid}>
+              <div className={styles.summaryCard}>
+                <span className={styles.summaryLabel}>Profile Score</span>
+                <span className={styles.summaryValue}>
+                  {analysisResult.profileScore}
+                </span>
+              </div>
+              {analysisResult.sections.map((section, idx) => (
+                <div key={`${section.title}-${idx}`} className={styles.summaryCard}>
+                  <span className={styles.summaryLabel}>{section.title}</span>
+                  <span className={styles.summaryValue}>{section.items.length}</span>
+                  <span className={styles.summarySubtext}>insights</span>
+                </div>
+              ))}
             </div>
 
             {/* Analysis Sections */}
@@ -293,19 +242,19 @@ export default function LinkedinAnalysis() {
                         {item.type === "positive" && (
                           <>
                             <div className={styles.itemHeader}>
-                              <span className={styles.checkmark}>✓</span>
+                              <span className={styles.checkmark}>✅</span>
+                              <span className={styles.itemInlineText}>{item.text}</span>
                               <span className={styles.scoreTag}>+{item.scoreImpact}</span>
                             </div>
-                            <p className={styles.itemText}>{item.text}</p>
                           </>
                         )}
                         {item.type === "negative" && (
                           <>
                             <div className={styles.itemHeader}>
-                              <span className={styles.cross}>✗</span>
+                              <span className={styles.cross}>⛔</span>
+                              <span className={styles.itemInlineText}>{item.text}</span>
                               <span className={styles.scoreTag}>+{item.scoreImpact}</span>
                             </div>
-                            <p className={styles.itemText}>{item.text}</p>
                             {item.suggestion && (
                               <div className={styles.suggestion}>
                                 <strong>Replace with a concise, targeted</strong>
@@ -318,9 +267,9 @@ export default function LinkedinAnalysis() {
                           <>
                             <div className={styles.itemHeader}>
                               <span className={styles.lightBulb}>💡</span>
+                              <span className={styles.itemInlineText}>{item.text}</span>
                               <span className={styles.scoreTag}>+{item.scoreImpact}</span>
                             </div>
-                            <p className={styles.itemText}>{item.text}</p>
                           </>
                         )}
                       </div>
@@ -329,6 +278,89 @@ export default function LinkedinAnalysis() {
                 </div>
               ))}
             </div>
+
+            {/* AI Recommendations (card layout) */}
+            {analysisResult.aiAnalysis && (
+              <div className={styles.aiCardGrid}>
+                <div className={styles.summaryCard}>
+                  <span className={styles.summaryLabel}>AI Score</span>
+                  <span className={styles.summaryValue}>
+                    {analysisResult.aiAnalysis.aiScore}
+                  </span>
+                  <p className={styles.cardText}>
+                    {analysisResult.aiAnalysis.scoreRationale}
+                  </p>
+                </div>
+
+                {!!analysisResult.aiAnalysis.recommendations?.length && (
+                  <div className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>Top Recommendations</span>
+                    <ul className={styles.cardList}>
+                      {analysisResult.aiAnalysis.recommendations.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {analysisResult.aiAnalysis.modifications.headline && (
+                  <div className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>Headline Rewrite</span>
+                    <p className={styles.cardText}>
+                      {analysisResult.aiAnalysis.modifications.headline}
+                    </p>
+                  </div>
+                )}
+
+                {analysisResult.aiAnalysis.modifications.about && (
+                  <div className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>About Rewrite</span>
+                    <p className={styles.cardText}>
+                      {analysisResult.aiAnalysis.modifications.about}
+                    </p>
+                  </div>
+                )}
+
+                {!!analysisResult.aiAnalysis.modifications.experienceBullets?.length && (
+                  <div className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>Experience Bullets</span>
+                    <ul className={styles.cardList}>
+                      {analysisResult.aiAnalysis.modifications.experienceBullets.map(
+                        (item, idx) => (
+                          <li key={idx}>{item}</li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                )}
+
+                {!!analysisResult.aiAnalysis.modifications.skills?.length && (
+                  <div className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>Suggested Skills</span>
+                    <div className={styles.cardTags}>
+                      {analysisResult.aiAnalysis.modifications.skills.map((item, idx) => (
+                        <span key={idx} className={styles.cardTag}>
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!!analysisResult.aiAnalysis.suggestedKeywords?.length && (
+                  <div className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>Suggested Keywords</span>
+                    <div className={styles.cardTags}>
+                      {analysisResult.aiAnalysis.suggestedKeywords.map((item, idx) => (
+                        <span key={idx} className={styles.cardTag}>
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Action Section */}
             <div className={styles.actionSection}>

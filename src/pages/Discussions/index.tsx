@@ -16,57 +16,72 @@ type FetchState = {
   error: string | null;
 };
 
-type RedditListing = {
-  data?: {
-    children?: Record<string, unknown>[];
-  };
-};
-
-const mapHackerNews = (hits: Record<string, unknown>[]): Discussion[] =>
-  hits
-    .filter((hit) => hit?.title)
-    .map((hit) => ({
-      title: hit.title as string,
-      source: "Hacker News",
-      category: "Engineering",
-      summary:
-        ((hit._highlightResult as Record<string, unknown>)?.title as Record<string, unknown>)?.value as string | undefined ??
-        "Trending on Hacker News",
-      link:
-        (hit.url as string | null) ||
-        `https://news.ycombinator.com/item?id=${hit.objectID}`,
-    }));
-
-const mapDevTo = (articles: Record<string, unknown>[]): Discussion[] =>
-  articles.map((article) => ({
-    title: article.title as string,
-    source: "Dev.to",
-    category: "Dev/Frameworks",
+const INDIA_TEACHING_TOPICS: Discussion[] = [
+  {
+    title: "NEP 2020 in practice: classroom changes that actually work",
+    source: "Teacher Community",
+    category: "Policy & Practice",
     summary:
-      (article.description as string | undefined) ??
-      "Frameworks, tips, and community threads.",
-    link: (article.url as string) ?? "https://dev.to",
-  }));
-
-const mapReddit = (posts: Record<string, unknown>[]): Discussion[] =>
-  posts.map((post) => {
-    const postData = post.data as Record<string, unknown> | undefined;
-    const selftext = postData?.selftext;
-    const url = postData?.url;
-    const permalink = postData?.permalink;
-
-    return {
-      title: (postData?.title as string) ?? "",
-      source: "Reddit r/programming",
-      category: "General",
-      summary:
-        (typeof selftext === "string" ? selftext.slice(0, 140) : undefined) ||
-        "Popular in r/programming",
-      link:
-        (typeof url === "string" ? url : undefined) ||
-        `https://reddit.com${typeof permalink === "string" ? permalink : ""}`,
-    };
-  });
+      "Share how you are aligning lesson plans to competency-based learning and assessment.",
+    link: "https://www.education.gov.in/",
+  },
+  {
+    title: "Foundational Literacy & Numeracy: effective routines for Grades 1-3",
+    source: "Primary Educators",
+    category: "Early Years",
+    summary:
+      "Discuss daily FLN routines, phonics approaches, and number sense activities.",
+    link: "https://www.education.gov.in/",
+  },
+  {
+    title: "Teaching STEM in low-resource classrooms",
+    source: "STEM Teachers India",
+    category: "STEM",
+    summary:
+      "Swap ideas for hands-on experiments using local materials and minimal tech.",
+    link: "https://www.education.gov.in/",
+  },
+  {
+    title: "Differentiated instruction for mixed-ability classrooms",
+    source: "Inclusive Education",
+    category: "Pedagogy",
+    summary:
+      "Share strategies for tiered assignments, peer learning, and scaffolding.",
+    link: "https://www.education.gov.in/",
+  },
+  {
+    title: "Classroom management in large classes (50+ students)",
+    source: "School Leaders",
+    category: "Classroom",
+    summary:
+      "Discuss seating, routines, and quick assessment techniques that scale.",
+    link: "https://www.education.gov.in/",
+  },
+  {
+    title: "Integrating local language instruction alongside English",
+    source: "Language Teachers",
+    category: "Language",
+    summary:
+      "Talk about bilingual resources, translanguaging, and reading fluency.",
+    link: "https://www.education.gov.in/",
+  },
+  {
+    title: "Project-based learning aligned to Indian curriculum",
+    source: "Project Learning Hub",
+    category: "PBL",
+    summary:
+      "Share project ideas, rubrics, and ways to assess collaboration.",
+    link: "https://www.education.gov.in/",
+  },
+  {
+    title: "Assessments beyond exams: portfolios and performance tasks",
+    source: "Assessment Circle",
+    category: "Assessment",
+    summary:
+      "Explore low-stakes checks for understanding and rubric-based grading.",
+    link: "https://www.education.gov.in/",
+  },
+];
 
 export default function Discussions() {
   const [state, setState] = useState<FetchState>({ items: [], error: null });
@@ -77,53 +92,15 @@ export default function Discussions() {
     let isMounted = true;
 
     const fetchAll = async () => {
-      try {
-        const [hnRes, devtoRes, redditRes] = await Promise.allSettled([
-          fetch("https://hn.algolia.com/api/v1/search?tags=front_page"),
-          fetch("https://dev.to/api/articles?per_page=12&top=7"),
-          fetch("https://www.reddit.com/r/programming/top.json?limit=12&t=day"),
-        ]);
-
-        const hnData =
-          hnRes.status === "fulfilled"
-            ? ((await hnRes.value.json()) as { hits?: Record<string, unknown>[] })
-            : { hits: [] };
-        const devtoData =
-          devtoRes.status === "fulfilled"
-            ? ((await devtoRes.value.json()) as Record<string, unknown>[])
-            : [];
-        const redditListing =
-          redditRes.status === "fulfilled"
-            ? ((await redditRes.value.json()) as RedditListing)
-            : undefined;
-        const redditData = redditListing?.data?.children ?? [];
-
-        const combined = [
-          ...mapHackerNews(hnData.hits ?? []),
-          ...mapDevTo(devtoData ?? []),
-          ...mapReddit(redditData ?? []),
-        ].filter((item) => item.title && item.link);
-
-        if (!isMounted) return;
-        setState({
-          items: combined.slice(0, 24),
-          error: null,
-        });
-      } catch (error) {
-        console.error("Failed to load discussions", error);
-        if (!isMounted) return;
-        setState({
-          items: [],
-          error: "Could not load discussions right now.",
-        });
-      } finally {
-        if (isMounted) {
-          setHasLoaded(true);
-        }
-      }
+      if (!isMounted) return;
+      setState({
+        items: INDIA_TEACHING_TOPICS,
+        error: null,
+      });
+      setHasLoaded(true);
     };
 
-    void withLoader(fetchAll, "Gathering trending discussions...");
+    void withLoader(fetchAll, "Loading India-focused teaching discussions...");
     return () => {
       isMounted = false;
     };

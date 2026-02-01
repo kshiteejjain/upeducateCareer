@@ -14,6 +14,16 @@ const initialFormState: RegisterFormRecord = {
   role: "teacher",
 };
 
+const indianBoards = [
+  "CBSE",
+  "CISCE (ICSE)",
+  "CISCE (ISC)",
+  "State Board",
+  "IB (International Baccalaureate)",
+  "Cambridge (IGCSE)",
+  "NIOS",
+];
+
 export default function Register() {
   const router = useRouter();
   const [formData, setFormData] = useState<RegisterFormRecord>(initialFormState);
@@ -35,11 +45,9 @@ export default function Register() {
       name: formData.name,
       email: formData.email,
       password: formData.password,
+      subject: formData.subject,
+      board: formData.board,
       mobileNumber: formData.mobileNumber,
-      courseName: formData.role === "student" ? formData.courseName : "",
-      courseDuration: formData.role === "student" ? formData.courseDuration : "",
-      courseStartDate:
-        formData.role === "student" ? formData.courseStartDate : "",
       createdAt: new Date().toISOString(),
     };
 
@@ -118,6 +126,19 @@ export default function Register() {
             </div>
 
             <div className="form-group">
+              <label>Email:</label>
+              <input
+                type="email"
+                name="email"
+                className="form-control"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
               <label>Mobile Number:</label>
               <input
                 type="tel"
@@ -131,16 +152,36 @@ export default function Register() {
             </div>
 
             <div className="form-group">
-              <label>Email:</label>
+              <label>Subject:</label>
               <input
-                type="email"
-                name="email"
+                type="text"
+                name="subject"
                 className="form-control"
-                placeholder="you@example.com"
-                value={formData.email}
+                placeholder="Enter subject you teach"
+                value={formData.subject}
                 onChange={handleChange}
                 required
               />
+            </div>
+
+            <div className="form-group">
+              <label>Board:</label>
+              <select
+                name="board"
+                className="form-control"
+                value={formData.board}
+                onChange={handleChange}
+                required
+              >
+                <option value="" disabled>
+                  Select board
+                </option>
+                {indianBoards.map((board) => (
+                  <option key={board} value={board}>
+                    {board}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="form-group">
@@ -156,11 +197,6 @@ export default function Register() {
               />
             </div>
 
-            {formData.role === "student" && (
-              <>
-              </>
-            )}
-
             <button type="submit" className="btn-primary" disabled={isLoading}>
               {isLoading ? "Registering..." : "Register"}
             </button>
@@ -171,7 +207,7 @@ export default function Register() {
             <a
               href="#"
               onClick={() => router.push("/login")}
-              className={styles.loginLink}
+              className="link"
             >
               Login here
             </a>

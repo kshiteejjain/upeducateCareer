@@ -2,6 +2,11 @@
 import Image from "next/image";
 import Layout from "@/components/Layout/Layout";
 import styles from "./ResumeBuilder.module.css";
+import { useLoader } from "@/components/Loader/LoaderProvider";
+import { getSession } from "@/utils/authSession";
+import { getDb } from "@/utils/firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 type Experience = {
   role: string;
@@ -16,11 +21,9 @@ type Education = {
   dates: string;
 };
 
-type ProjectItem = {
+type SkillItem = {
   name: string;
-  dates: string;
-  summary: string;
-  tech: string;
+  rating: number;
 };
 
 type ResumeTemplate = {
@@ -32,72 +35,24 @@ type ResumeTemplate = {
   phone: string;
   photo?: string;
   summary: string;
-  skills: string[];
+  skills: SkillItem[];
   languages: string[];
   experiences: Experience[];
   education: Education[];
-  projects: ProjectItem[];
+};
+
+type AiResumeResult = {
+  score: number;
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  suggestions: string[];
+  rewriteSummary: string;
+  keywords: string[];
+  parsedResume?: ResumeTemplate;
 };
 
 const templates: ResumeTemplate[] = [
-  {
-    id: "modern",
-    name: "Andree Rocher",
-    title: "Data Scientist",
-    location: "Philadelphia, PA",
-    email: "andree@example.com",
-    phone: "705.555.0121",
-    summary:
-      "Analytical data scientist seeking to drive insight and decision-making for customer-facing products. Comfortable with end-to-end pipelines from data prep through modeling and storytelling.",
-    skills: ["Python", "Machine Learning", "SQL", "A/B Testing", "Storytelling", "Dashboards"],
-    languages: ["English (Fluent)"],
-    experiences: [
-      {
-        role: "Data Scientist",
-        company: "FluoreGen",
-        dates: "2021 - 2024",
-        bullets: [
-          "Increased retention by 20% via tailored churn models.",
-          "Optimized recharge pricing and recommendations.",
-        ],
-      },
-      {
-        role: "Junior Data Scientist",
-        company: "Panthera Labs",
-        dates: "2019 - 2021",
-        bullets: [
-          "Cleaned and preprocessed sales data.",
-          "Built models for decision support and demand forecasting.",
-        ],
-      },
-    ],
-    education: [
-      {
-        school: "Jasper University",
-        degree: "MS Data Science",
-        dates: "2021",
-      },
-      {
-        school: "Bellows College",
-        degree: "BS Mathematics",
-        dates: "2019",
-      },
-    ],
-    projects: [
-      {
-        name: "Customer Churn Predictor",
-        dates: "2023",
-        summary: "Built a churn prediction model using transactional and support ticket data to prioritize outreach.",
-        tech: "Python, scikit-learn, SQL",
-      },
-      {
-        name: "Product Analytics Dashboard",
-        dates: "2022",
-        summary: "Shipped a self-serve dashboard for product metrics with cohort analysis and retention views.",
-        tech: "Tableau, SQL, Python",
-      },
-    ],
-  },
   {
     id: "navy",
     name: "Richard Sanchez",
@@ -110,13 +65,13 @@ const templates: ResumeTemplate[] = [
     summary:
       "Experienced marketing manager skilled in brand strategy, multi-channel campaigns, and team leadership. Adept at driving growth through creative storytelling and datxinformed decisions.",
     skills: [
-      "Project Management",
-      "Public Relations",
-      "Teamwork",
-      "Time Management",
-      "Leadership",
-      "Effective Communication",
-      "Critical Thinking",
+      { name: "Project Management", rating: 4 },
+      { name: "Public Relations", rating: 4 },
+      { name: "Teamwork", rating: 5 },
+      { name: "Time Management", rating: 4 },
+      { name: "Leadership", rating: 4 },
+      { name: "Effective Communication", rating: 5 },
+      { name: "Critical Thinking", rating: 4 },
     ],
     languages: ["English (Fluent)", "French (Fluent)", "German (Basics)", "Spanish (Intermediate)"],
     experiences: [
@@ -160,20 +115,6 @@ const templates: ResumeTemplate[] = [
         dates: "2025 - 2029",
       },
     ],
-    projects: [
-      {
-        name: "Brand Relaunch Campaign",
-        dates: "2029",
-        summary: "Led a cross-channel brand relaunch increasing qualified leads by 18% over two quarters.",
-        tech: "HubSpot, Google Analytics, Meta Ads",
-      },
-      {
-        name: "Content Operations Revamp",
-        dates: "2028",
-        summary: "Redesigned content workflows and editorial calendar, reducing production cycle time by 25%.",
-        tech: "Asana, Notion, Canva",
-      },
-    ],
   },
 ];
 
@@ -190,7 +131,17 @@ export default function ResumeBuilder() {
   );
   const [form, setForm] = useState<ResumeTemplate>(() => emptyState(templates[0]));
   const [skillInput, setSkillInput] = useState("");
+  const [skillRating, setSkillRating] = useState(3);
+  const [languageInput, setLanguageInput] = useState("");
   const previewRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<"upload" | "manual">("upload");
+  const [previewTemplate, setPreviewTemplate] = useState<"navy" | "clean" | "slate">("navy");
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [extractedText, setExtractedText] = useState("");
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [aiResult, setAiResult] = useState<AiResumeResult | null>(null);
+  const [uploadFileName, setUploadFileName] = useState("");
+  const { withLoader } = useLoader();
 
   const loadTemplate = (id: string) => {
     const tpl = templates.find((t) => t.id === id) ?? templates[0];
@@ -218,30 +169,108 @@ export default function ResumeBuilder() {
     });
   };
 
-  const updateProject = (index: number, key: keyof ProjectItem, value: unknown) => {
-    setForm((prev) => {
-      const next = [...prev.projects];
-      next[index] = { ...next[index], [key]: value };
-      return { ...prev, projects: next };
-    });
+  const addEducation = () => {
+    setForm((prev) => ({
+      ...prev,
+      education: [...prev.education, { school: "", degree: "", dates: "" }],
+    }));
+  };
+
+  const removeEducation = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      education: prev.education.filter((_, idx) => idx !== index),
+    }));
   };
 
   const addSkill = () => {
     const value = skillInput.trim();
     if (!value) return;
     setForm((prev) =>
-      prev.skills.includes(value) ? prev : { ...prev, skills: [...prev.skills, value] }
+      prev.skills.some((s) => s.name.toLowerCase() === value.toLowerCase())
+        ? prev
+        : { ...prev, skills: [...prev.skills, { name: value, rating: skillRating }] }
     );
     setSkillInput("");
+    setSkillRating(3);
   };
 
-  const removeSkill = (skill: string) => {
-    setForm((prev) => ({ ...prev, skills: prev.skills.filter((s) => s !== skill) }));
+  const removeSkill = (skillName: string) => {
+    setForm((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((s) => s.name !== skillName),
+    }));
   };
 
-  const downloadPdf = async () => {
+  const updateSkillRating = (skillName: string, rating: number) => {
+    setForm((prev) => ({
+      ...prev,
+      skills: prev.skills.map((s) =>
+        s.name === skillName ? { ...s, rating } : s
+      ),
+    }));
+  };
+
+  const addLanguage = () => {
+    const value = languageInput.trim();
+    if (!value) return;
+    setForm((prev) =>
+      prev.languages.some((lang) => lang.toLowerCase() === value.toLowerCase())
+        ? prev
+        : { ...prev, languages: [...prev.languages, value] }
+    );
+    setLanguageInput("");
+  };
+
+  const removeLanguage = (langName: string) => {
+    setForm((prev) => ({
+      ...prev,
+      languages: prev.languages.filter((lang) => lang !== langName),
+    }));
+  };
+
+  const handlePhotoUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === "string" ? reader.result : "";
+      if (result) updateField("photo", result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const saveDownloadResume = async () => {
     if (!previewRef.current) return;
+    const session = getSession();
+    if (!session?.email) {
+      toast.error("Please log in to save your resume.");
+      return;
+    }
+
     try {
+      const db = getDb();
+      const userRef = doc(db, "upEducatePlusUsers", session.email.toLowerCase());
+      const resumePayload = {
+        templateId: selectedTemplate.id,
+        templateName: selectedTemplate.title || "",
+        previewTemplate,
+        updatedAt: serverTimestamp(),
+        data: {
+          name: form.name,
+          title: form.title,
+          location: form.location,
+          email: form.email,
+          phone: form.phone,
+          photo: form.photo ?? "",
+          summary: form.summary,
+          skills: form.skills,
+          languages: form.languages,
+          experiences: form.experiences,
+          education: form.education,
+        },
+      };
+
+      await setDoc(userRef, { resume: resumePayload }, { merge: true });
+
       const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
         import("html2canvas"),
         import("jspdf"),
@@ -275,11 +304,360 @@ export default function ResumeBuilder() {
         .replace(/\s+/g, "-")
         .toLowerCase();
       pdf.save(`${nameSlug}-${roleSlug}.pdf`);
+      toast.success("Resume saved and downloaded.");
     } catch (err) {
-      console.error("Failed to generate PDF", err);
-      window.alert("Could not generate PDF. Please try again.");
+      console.error("Failed to save resume or generate PDF", err);
+      toast.error("Could not save or download the resume. Please try again.");
     }
   };
+
+  const extractTextFromPdf = async (file: File) => {
+    const pdfjs = await import("pdfjs-dist/build/pdf.mjs");
+    (pdfjs as any).GlobalWorkerOptions.workerSrc = new URL(
+      "pdfjs-dist/build/pdf.worker.min.mjs",
+      import.meta.url
+    ).toString();
+    const data = await file.arrayBuffer();
+    const loadingTask = pdfjs.getDocument({ data });
+    const pdf = await loadingTask.promise;
+    let fullText = "";
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      const pageText = content.items
+        .map((item: any) => ("str" in item ? item.str : ""))
+        .join(" ");
+      fullText += `${pageText}\n`;
+    }
+    return fullText.trim();
+  };
+
+  const extractTextFromDocx = async (file: File) => {
+    const mammoth = await import("mammoth/mammoth.browser");
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return result.value.trim();
+  };
+
+  const handleFileUpload = async (file: File) => {
+    setUploadError(null);
+    setAiResult(null);
+    setExtractedText("");
+
+    const name = file.name.toLowerCase();
+    const isPdf = name.endsWith(".pdf") || file.type === "application/pdf";
+    const isDocx =
+      name.endsWith(".docx") ||
+      file.type ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    const isDoc = name.endsWith(".doc") || file.type === "application/msword";
+
+    if (!isPdf && !isDocx && !isDoc) {
+      setUploadError("Only PDF or Word (.docx) files are supported.");
+      return;
+    }
+
+    if (isDoc) {
+      setUploadError("Please upload a .docx file (legacy .doc is not supported).");
+      return;
+    }
+
+    setIsExtracting(true);
+    let text = "";
+    try {
+      text = isPdf ? await extractTextFromPdf(file) : await extractTextFromDocx(file);
+      if (!text || text.replace(/\s/g, "").length < 50) {
+        setUploadError(
+          "No extractable text found. Please upload a text-based PDF or a DOCX file."
+        );
+        return;
+      }
+      setExtractedText(text);
+    } catch (error) {
+      console.error("Resume text extraction failed", error);
+      setUploadError("Could not extract text from the uploaded file.");
+      return;
+    } finally {
+      setIsExtracting(false);
+    }
+
+    try {
+      await withLoader(async () => {
+        const response = await fetch("/api/resumeImprove", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        const data = (await response.json()) as AiResumeResult & { message?: string };
+        if (!response.ok) {
+          throw new Error(data?.message || "Failed to generate AI improvements.");
+        }
+        setAiResult(data);
+        if (data.parsedResume) {
+          const normalizedSkills = (data.parsedResume.skills || []).map((skill: any) =>
+            typeof skill === "string"
+              ? { name: skill, rating: 3 }
+              : {
+                  name: String(skill?.name ?? ""),
+                  rating: Math.max(1, Math.min(5, Number(skill?.rating ?? 3))),
+                }
+          );
+          setForm((prev) => ({
+            ...prev,
+            ...data.parsedResume,
+            skills: normalizedSkills,
+            languages: data.parsedResume.languages || [],
+            experiences: data.parsedResume.experiences || [],
+            education: data.parsedResume.education || [],
+          }));
+          setActiveTab("manual");
+        }
+      }, "Generating AI feedback...");
+    } catch (error) {
+      console.error("Resume AI failed", error);
+      setUploadError(
+        error instanceof Error ? error.message : "Failed to generate AI improvements."
+      );
+    }
+  };
+
+  const renderStars = (rating: number) => {
+    const safe = Math.max(1, Math.min(5, Math.round(rating)));
+    return `${"★".repeat(safe)}${"☆".repeat(5 - safe)}`;
+  };
+
+  const renderNavyTemplate = () => (
+    <div ref={previewRef} className={styles.navyWrapper}>
+      <div className={styles.navySidebar}>
+        {form.photo && (
+          <div className={styles.photoCircle}>
+            <Image src={form.photo} alt="Profile" width={120} height={120} />
+          </div>
+        )}
+        <div className={styles.sidebarBlock}>
+          <h4>CONTACT</h4>
+          <ul>
+            <li>{form.phone}</li>
+            <li>{form.email}</li>
+            <li>{form.location}</li>
+          </ul>
+        </div>
+        <div className={styles.sidebarBlock}>
+          <h4>EDUCATION</h4>
+          <ul>
+            {form.education.map((edu, idx) => (
+              <li key={idx}>
+                <div className={styles.bold}>{edu.school}</div>
+                <div>{edu.degree}</div>
+                <div>{edu.dates}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className={styles.sidebarBlock}>
+          <h4>SKILLS</h4>
+          <ul>
+            {form.skills.map((skill, idx) => (
+              <li key={idx} className={styles.skillRow}>
+                <span className={styles.skillName}>{skill.name}</span>
+                <span className={styles.skillStars}>{renderStars(skill.rating)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className={styles.sidebarBlock}>
+          <h4>LANGUAGES</h4>
+          <ul>
+            {form.languages.map((lang, idx) => (
+              <li key={idx}>{lang}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className={styles.navyMain}>
+        <div className={styles.navyHeaderText}>
+          <div className={styles.resumeName}>{form.name}</div>
+          <div className={styles.resumeTitle}>{form.title}</div>
+        </div>
+
+        <div className={styles.divider} />
+
+        <div className={styles.resumeSection}>
+          <h4>PROFILE</h4>
+          <div className={styles.resumeList} style={{ listStyle: "none", paddingLeft: 0 }}>
+            <div>{form.summary}</div>
+          </div>
+        </div>
+
+        <div className={styles.resumeSection}>
+          <h4>WORK EXPERIENCE</h4>
+          <ul className={styles.resumeList}>
+            {form.experiences.map((exp, idx) => (
+              <li key={idx}>
+                <div className={styles.resumeItemTitle}>{exp.company}</div>
+                <div className={styles.resumeTitleSmall}>{exp.role}</div>
+                <div className={styles.resumeMeta}>{exp.dates}</div>
+                <ul className={styles.resumeList}>
+                  {exp.bullets.map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  );
+
+  const renderCleanTemplate = () => (
+    <div ref={previewRef} className={styles.cleanWrapper}>
+      <div className={styles.cleanHeader}>
+        <div>
+          <div className={styles.cleanName}>{form.name}</div>
+          <div className={styles.cleanTitle}>{form.title}</div>
+        </div>
+        <div className={styles.cleanMeta}>
+          <span>✉ {form.email}</span>
+          <span>☎ {form.phone}</span>
+          <span>📍 {form.location}</span>
+        </div>
+      </div>
+      <div className={styles.cleanDivider} />
+      <div className={styles.cleanGrid}>
+        <div>
+          <div className={styles.cleanSection}>
+            <h4>Profile</h4>
+            <p>{form.summary}</p>
+          </div>
+          <div className={styles.cleanSection}>
+            <h4>Experience</h4>
+            {form.experiences.map((exp, idx) => (
+              <div key={idx} className={styles.cleanItem}>
+                <div className={styles.cleanItemTitle}>
+                  {exp.role} — {exp.company}
+                </div>
+                <div className={styles.cleanItemMeta}>{exp.dates}</div>
+                <ul>
+                  {exp.bullets.map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className={styles.cleanSection}>
+            <h4>Skills</h4>
+            <ul>
+              {form.skills.map((skill, idx) => (
+                <li key={idx} className={styles.skillRow}>
+                  <span className={styles.skillName}>{skill.name}</span>
+                  <span className={styles.skillStars}>{renderStars(skill.rating)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className={styles.cleanSection}>
+            <h4>Education</h4>
+            {form.education.map((edu, idx) => (
+              <div key={idx} className={styles.cleanItem}>
+                <div className={styles.cleanItemTitle}>{edu.school}</div>
+                <div>{edu.degree}</div>
+                <div className={styles.cleanItemMeta}>{edu.dates}</div>
+              </div>
+            ))}
+          </div>
+          <div className={styles.cleanSection}>
+            <h4>Languages</h4>
+            <ul>
+              {form.languages.map((lang, idx) => (
+                <li key={idx}>{lang}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSlateTemplate = () => (
+    <div ref={previewRef} className={styles.slateWrapper}>
+      <div className={styles.slateHeader}>
+        {form.photo && (
+          <div className={styles.slatePhoto}>
+            <Image src={form.photo} alt="Profile" width={90} height={90} />
+          </div>
+        )}
+        <div>
+          <div className={styles.slateName}>{form.name}</div>
+          <div className={styles.slateTitle}>{form.title}</div>
+          <div className={styles.slateMeta}>
+            {form.email} • {form.phone} • {form.location}
+          </div>
+        </div>
+      </div>
+      <div className={styles.slateDivider} />
+      <div className={styles.slateSection}>
+        <h4>Summary</h4>
+        <p>{form.summary}</p>
+      </div>
+      <div className={styles.slateTwoCol}>
+        <div>
+          <div className={styles.slateSection}>
+            <h4>Experience</h4>
+            {form.experiences.map((exp, idx) => (
+              <div key={idx} className={styles.slateItem}>
+                <div className={styles.slateItemTitle}>{exp.role}</div>
+                <div className={styles.slateItemMeta}>
+                  {exp.company} • {exp.dates}
+                </div>
+                <ul>
+                  {exp.bullets.map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className={styles.slateSection}>
+            <h4>Skills</h4>
+            <ul>
+              {form.skills.map((skill, idx) => (
+                <li key={idx} className={styles.skillRow}>
+                  <span className={styles.skillName}>{skill.name}</span>
+                  <span className={styles.skillStars}>{renderStars(skill.rating)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className={styles.slateSection}>
+            <h4>Education</h4>
+            {form.education.map((edu, idx) => (
+              <div key={idx} className={styles.slateItem}>
+                <div className={styles.slateItemTitle}>{edu.school}</div>
+                <div className={styles.slateItemMeta}>{edu.degree}</div>
+                <div className={styles.slateItemMeta}>{edu.dates}</div>
+              </div>
+            ))}
+          </div>
+          <div className={styles.slateSection}>
+            <h4>Languages</h4>
+            <ul>
+              {form.languages.map((lang, idx) => (
+                <li key={idx}>{lang}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <Layout>
@@ -293,26 +671,125 @@ export default function ResumeBuilder() {
           </div>
         </div>
 
-        <div className={`${styles.templatePicker} ${styles.noPrint}`}>
-          {templates.map((tpl) => (
-            <button
-              key={tpl.id}
-              className={`${styles.chipButton} ${
-                selectedId === tpl.id ? styles.chipButtonActive : ""
-              }`}
-              onClick={() => loadTemplate(tpl.id)}
-            >
-              {tpl.id === "modern" ? "Modern Minimal" : tpl.id === "navy" ? "Navy Profile" : "Elegant Split"}
-            </button>
-          ))}
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tabButton} ${activeTab === "upload" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("upload")}
+          >
+            Upload CV
+          </button>
+          <button
+            className={`${styles.tabButton} ${activeTab === "manual" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("manual")}
+          >
+            Build Manually
+          </button>
         </div>
 
         <div className={styles.layout}>
           <div className={`${styles.card} ${styles.noPrint}`}>
-            <div className={styles.formHeader}>
-              <h3 className={styles.sectionTitle}>Fill your details</h3>
-            </div>
-            <div className={styles.formGrid}>
+            {activeTab === "upload" && (
+              <>
+                <div className={styles.uploadCard}>
+                  <div className={styles.formHeader}>
+                    <h3 className={styles.sectionTitle}>Upload your CV</h3>
+                  </div>
+                  <p className={styles.uploadHint}>
+                    Upload a PDF or DOCX. We will extract the text before sending it to AI.
+                  </p>
+                  <div className={styles.uploadRow}>
+                    <label className={styles.fileButton}>
+                      📄 Upload CV
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        className={styles.fileInputHidden}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setUploadFileName(file.name);
+                            handleFileUpload(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <span className={styles.fileName}>
+                      {uploadFileName || "No file selected"}
+                    </span>
+                  </div>
+                  {isExtracting && <p className={styles.uploadStatus}>Extracting text...</p>}
+                  {uploadError && <p className={styles.uploadError}>{uploadError}</p>}
+                </div>
+
+                {aiResult && (
+                  <div className={styles.aiCard}>
+                    <div className={styles.aiHeader}>
+                      <h3 className={styles.sectionTitle}>✨ AI Resume Review</h3>
+                      <span className={styles.aiScore}>⭐ {aiResult.score}/100</span>
+                    </div>
+                    <p className={styles.aiSummary}>{aiResult.summary}</p>
+                    {!!aiResult.strengths.length && (
+                      <div className={styles.aiBlock}>
+                        <h4>✅ Strengths</h4>
+                        <ul>
+                          {aiResult.strengths.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {!!aiResult.improvements.length && (
+                      <div className={styles.aiBlock}>
+                        <h4>🛠️ Improvements</h4>
+                        <ul>
+                          {aiResult.improvements.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {!!aiResult.suggestions.length && (
+                      <div className={styles.aiBlock}>
+                        <h4>💡 Suggestions</h4>
+                        <ul>
+                          {aiResult.suggestions.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {aiResult.rewriteSummary && (
+                      <div className={styles.aiBlock}>
+                        <h4>📝 Suggested Summary</h4>
+                        <p>{aiResult.rewriteSummary}</p>
+                      </div>
+                    )}
+                    {!!aiResult.keywords.length && (
+                      <div className={styles.aiBlock}>
+                        <h4>🏷️ Suggested Keywords</h4>
+                        <div className={styles.keywordList}>
+                          {aiResult.keywords.map((item, idx) => (
+                            <span key={idx} className={styles.keywordTag}>
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+
+            {activeTab === "manual" && (
+              <>
+                <div className={styles.formHeader}>
+                  <h3 className={styles.sectionTitle}>Fill your details</h3>
+                </div>
+                <details className={styles.accordion} open>
+                  <summary className={styles.accordionHeader}>Basic Info</summary>
+                  <div className={styles.accordionBody}>
+                    <div className={styles.formGrid}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Full Name</label>
                 <input
@@ -366,372 +843,277 @@ export default function ResumeBuilder() {
                   placeholder="https://example.com/photo.jpg"
                   onChange={(e) => updateField("photo", e.target.value)}
                 />
-              </div>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Profile Summary</label>
-              <textarea
-                className={styles.textarea}
-                value={form.summary}
-                placeholder="Summarize your experience and value in 3-5 sentences."
-                onChange={(e) => updateField("summary", e.target.value)}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Skills (tags)</label>
-              <div className={styles.skillsRow}>
                 <input
-                  className={`${styles.input} ${styles.skillInput}`}
-                  value={skillInput}
-                  placeholder="e.g., React, SQL, Leadership"
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addSkill();
-                    }
+                  type="file"
+                  accept="image/*"
+                  className={styles.fileInputSmall}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handlePhotoUpload(file);
                   }}
                 />
-                <button type="button" className={styles.addButton} onClick={addSkill}>
-                  Add
-                </button>
-              </div>
-              <div className={styles.tagList}>
-                {form.skills.map((skill) => (
-                  <span key={skill} className={styles.tag}>
-                    {skill}
-                    <button type="button" onClick={() => removeSkill(skill)}>
-                      x
-                    </button>
-                  </span>
-                ))}
               </div>
             </div>
+                  </div>
+                </details>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Experiences</label>
-              {form.experiences.map((exp, idx) => (
-                <div key={idx} className={styles.card} style={{ padding: 12, marginBottom: 8 }}>
-                  <div className={styles.formGrid}>
+                <details className={styles.accordion}>
+                  <summary className={styles.accordionHeader}>Profile Summary</summary>
+                  <div className={styles.accordionBody}>
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>Role</label>
-                      <input
-                        className={styles.input}
-                        value={exp.role}
-                        onChange={(e) => updateExperience(idx, "role", e.target.value)}
-                        placeholder="Job Title"
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Company</label>
-                      <input
-                        className={styles.input}
-                        value={exp.company}
-                        onChange={(e) => updateExperience(idx, "company", e.target.value)}
-                        placeholder="Company"
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Dates</label>
-                      <input
-                        className={styles.input}
-                        value={exp.dates}
-                        onChange={(e) => updateExperience(idx, "dates", e.target.value)}
-                        placeholder="2023 - Present"
+                      <label className={styles.label}>Profile Summary</label>
+                      <textarea
+                        className={styles.textarea}
+                        value={form.summary}
+                        placeholder="Summarize your experience and value in 3-5 sentences."
+                        onChange={(e) => updateField("summary", e.target.value)}
                       />
                     </div>
                   </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Highlights (one per line)</label>
-                    <textarea
-                      className={styles.textarea}
-                      value={exp.bullets.join("\n")}
-                      onChange={(e) =>
-                        updateExperience(idx, "bullets", e.target.value.split("\n").filter(Boolean))
-                      }
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                </details>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Education</label>
-              {form.education.map((edu, idx) => (
-                <div key={idx} className={styles.card} style={{ padding: 12, marginBottom: 8 }}>
-                  <div className={styles.formGrid}>
+                <details className={styles.accordion}>
+                  <summary className={styles.accordionHeader}>Skills</summary>
+                  <div className={styles.accordionBody}>
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>School</label>
-                      <input
-                        className={styles.input}
-                        value={edu.school}
-                        onChange={(e) => updateEducation(idx, "school", e.target.value)}
-                        placeholder="University Name"
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Degree</label>
-                      <input
-                        className={styles.input}
-                        value={edu.degree}
-                        onChange={(e) => updateEducation(idx, "degree", e.target.value)}
-                        placeholder="Degree / Major"
-                      />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Dates</label>
-                      <input
-                        className={styles.input}
-                        value={edu.dates}
-                        onChange={(e) => updateEducation(idx, "dates", e.target.value)}
-                        placeholder="2019 - 2023"
-                      />
+                      <label className={styles.label}>Skills (tags)</label>
+                      <div className={styles.skillsRow}>
+                        <input
+                          className={`${styles.input} ${styles.skillInput}`}
+                          value={skillInput}
+                          placeholder="e.g., React, SQL, Leadership"
+                          onChange={(e) => setSkillInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addSkill();
+                            }
+                          }}
+                        />
+                        <select
+                          className={styles.ratingSelect}
+                          value={skillRating}
+                          onChange={(e) => setSkillRating(Number(e.target.value))}
+                        >
+                          {[1, 2, 3, 4, 5].map((r) => (
+                            <option key={r} value={r}>
+                              {r}/5
+                            </option>
+                          ))}
+                        </select>
+                        <button type="button" className="btn-primary" onClick={addSkill}>
+                          Add
+                        </button>
+                      </div>
+                      <div className={styles.tagList}>
+                        {form.skills.map((skill) => (
+                          <div key={skill.name} className={styles.tag}>
+                            <span>{skill.name}</span>
+                            <span className={styles.starText}>{renderStars(skill.rating)}</span>
+                            <select
+                              className={styles.ratingSelectSmall}
+                              value={skill.rating}
+                              onChange={(e) =>
+                                updateSkillRating(skill.name, Number(e.target.value))
+                              }
+                            >
+                              {[1, 2, 3, 4, 5].map((r) => (
+                                <option key={r} value={r}>
+                                  {r}
+                                </option>
+                              ))}
+                            </select>
+                            <button type="button" onClick={() => removeSkill(skill.name)}>
+                              x
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                </details>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Projects</label>
-              {form.projects.map((proj, idx) => (
-                <div key={idx} className={styles.card} style={{ padding: 12, marginBottom: 8 }}>
-                  <div className={styles.formGrid}>
+            
+                <details className={styles.accordion}>
+                  
+                <details className={styles.accordion}>
+                  <summary className={styles.accordionHeader}>Languages</summary>
+                  <div className={styles.accordionBody}>
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>Project Name</label>
-                      <input
-                        className={styles.input}
-                        value={proj.name}
-                        onChange={(e) => updateProject(idx, "name", e.target.value)}
-                        placeholder="Project Name"
-                      />
+                      <label className={styles.label}>Languages</label>
+                      <div className={styles.skillsRow}>
+                        <input
+                          className={styles.input}
+                          value={languageInput}
+                          placeholder="e.g., English, Hindi"
+                          onChange={(e) => setLanguageInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addLanguage();
+                            }
+                          }}
+                        />
+                        <button type="button" className="btn-primary" onClick={addLanguage}>
+                          Add
+                        </button>
+                      </div>
+                      <div className={styles.tagList}>
+                        {form.languages.map((lang) => (
+                          <div key={lang} className={styles.tag}>
+                            <span>{lang}</span>
+                            <button type="button" onClick={() => removeLanguage(lang)}>
+                              x
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+                  </div>
+                </details>
+
+<summary className={styles.accordionHeader}>Experience</summary>
+                  <div className={styles.accordionBody}>
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>Dates</label>
-                      <input
-                        className={styles.input}
-                        value={proj.dates}
-                        onChange={(e) => updateProject(idx, "dates", e.target.value)}
-                        placeholder="2023 - Present"
-                      />
+                      <label className={styles.label}>Experiences</label>
+                      {form.experiences.map((exp, idx) => (
+                        <div key={idx} className={styles.card} style={{ padding: 12, marginBottom: 8 }}>
+                          <div className={styles.formGrid}>
+                            <div className={styles.formGroup}>
+                              <label className={styles.label}>Role</label>
+                              <input
+                                className={styles.input}
+                                value={exp.role}
+                                onChange={(e) => updateExperience(idx, "role", e.target.value)}
+                                placeholder="Job Title"
+                              />
+                            </div>
+                            <div className={styles.formGroup}>
+                              <label className={styles.label}>Company</label>
+                              <input
+                                className={styles.input}
+                                value={exp.company}
+                                onChange={(e) => updateExperience(idx, "company", e.target.value)}
+                                placeholder="Company"
+                              />
+                            </div>
+                            <div className={styles.formGroup}>
+                              <label className={styles.label}>Dates</label>
+                              <input
+                                className={styles.input}
+                                value={exp.dates}
+                                onChange={(e) => updateExperience(idx, "dates", e.target.value)}
+                                placeholder="2023 - Present"
+                              />
+                            </div>
+                          </div>
+                          <div className={styles.formGroup}>
+                            <label className={styles.label}>Highlights (one per line)</label>
+                            <textarea
+                              className={styles.textarea}
+                              value={exp.bullets.join("\n")}
+                              onChange={(e) =>
+                                updateExperience(idx, "bullets", e.target.value.split("\n").filter(Boolean))
+                              }
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Summary</label>
-                    <textarea
-                      className={styles.textarea}
-                      value={proj.summary}
-                      onChange={(e) => updateProject(idx, "summary", e.target.value)}
-                      placeholder="Short project description and outcomes"
-                    />
+                </details>
+
+                <details className={styles.accordion}>
+                  <summary className={styles.accordionHeader}>Education</summary>
+                  <div className={styles.accordionBody}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Education</label>
+                      {form.education.map((edu, idx) => (
+                        <div key={idx} className={styles.card} style={{ padding: 12, marginBottom: 8 }}>
+                          <div className={styles.formGrid}>
+                            <div className={styles.formGroup}>
+                              <label className={styles.label}>School</label>
+                              <input
+                                className={styles.input}
+                                value={edu.school}
+                                onChange={(e) => updateEducation(idx, "school", e.target.value)}
+                                placeholder="University Name"
+                              />
+                            </div>
+                            <div className={styles.formGroup}>
+                              <label className={styles.label}>Degree</label>
+                              <input
+                                className={styles.input}
+                                value={edu.degree}
+                                onChange={(e) => updateEducation(idx, "degree", e.target.value)}
+                                placeholder="Degree / Major"
+                              />
+                            </div>
+                            <div className={styles.formGroup}>
+                              <label className={styles.label}>Dates</label>
+                              <input
+                                className={styles.input}
+                                value={edu.dates}
+                                onChange={(e) => updateEducation(idx, "dates", e.target.value)}
+                                placeholder="2019 - 2023"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={() => removeEducation(idx)}
+                          >
+                            Remove Education
+                          </button>
+                        </div>
+                      ))}
+                      <button type="button" className="btn-primary" onClick={addEducation}>
+                        Add Education
+                      </button>
+                    </div>
                   </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Tech / Tools</label>
-                    <input
-                      className={styles.input}
-                      value={proj.tech}
-                      onChange={(e) => updateProject(idx, "tech", e.target.value)}
-                      placeholder="React, Node.js, PostgreSQL"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                </details>
+
+              </>
+            )}
           </div>
 
           <div className={`${styles.card} ${styles.previewCard} ${styles.printArea}`}>
             <div className={styles.previewHeader}>
-              <h3 className={styles.sectionTitle}>Preview</h3>
-              <button type="button" className={styles.downloadButton} onClick={downloadPdf}>
-                Download PDF
-              </button>
+              <div>
+                <h3 className={styles.sectionTitle}>Preview</h3>
+                <p className={styles.previewSub}>Choose a resume template style</p>
+              </div>
+              <div className={styles.previewActions}>
+                <select
+                  className={styles.templateSelect}
+                  value={previewTemplate}
+                  onChange={(e) =>
+                    setPreviewTemplate(e.target.value as "navy" | "clean" | "slate")
+                  }
+                >
+                  <option value="navy">Classic Navy</option>
+                  <option value="clean">Classic Clean</option>
+                  <option value="slate">Classic Slate</option>
+                </select>
+              </div>
             </div>
 
-            {selectedId === "navy" ? (
-              <div ref={previewRef} className={styles.navyWrapper}>
-                <div className={styles.navySidebar}>
-                  {form.photo && (
-                    <div className={styles.photoCircle}>
-                      <Image src={form.photo} alt="Profile" width={120} height={120} />
-                    </div>
-                  )}
-                  <div className={styles.sidebarBlock}>
-                    <h4>CONTACT</h4>
-                    <ul>
-                      <li>{form.phone}</li>
-                      <li>{form.email}</li>
-                      <li>{form.location}</li>
-                    </ul>
-                  </div>
-                  <div className={styles.sidebarBlock}>
-                    <h4>EDUCATION</h4>
-                    <ul>
-                      {form.education.map((edu, idx) => (
-                        <li key={idx}>
-                          <div className={styles.bold}>{edu.school}</div>
-                          <div>{edu.degree}</div>
-                          <div>{edu.dates}</div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className={styles.sidebarBlock}>
-                    <h4>SKILLS</h4>
-                    <ul>
-                      {form.skills.map((skill, idx) => (
-                        <li key={idx}>{skill}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className={styles.sidebarBlock}>
-                    <h4>LANGUAGES</h4>
-                    <ul>
-                      {form.languages.map((lang, idx) => (
-                        <li key={idx}>{lang}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className={styles.navyMain}>
-                  <div className={styles.navyHeaderText}>
-                    <div className={styles.resumeName}>{form.name}</div>
-                    <div className={styles.resumeTitle}>{form.title}</div>
-                  </div>
-
-                  <div className={styles.divider} />
-
-                  <div className={styles.resumeSection}>
-                    <h4>PROFILE</h4>
-                    <div className={styles.resumeList} style={{ listStyle: "none", paddingLeft: 0 }}>
-                      <div>{form.summary}</div>
-                    </div>
-                  </div>
-
-                  <div className={styles.resumeSection}>
-                    <h4>WORK EXPERIENCE</h4>
-                    <ul className={styles.resumeList}>
-                      {form.experiences.map((exp, idx) => (
-                        <li key={idx}>
-                            <div className={styles.resumeItemTitle}>{exp.company}</div>
-                            <div className={styles.resumeTitleSmall}>{exp.role}</div>
-                            <div className={styles.resumeMeta}>{exp.dates}</div>
-                            <ul className={styles.resumeList}>
-                              {exp.bullets.map((b, i) => (
-                                <li key={i}>{b}</li>
-                              ))}
-                            </ul>
-                          </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className={styles.resumeSection}>
-                    <h4>PROJECTS</h4>
-                    <ul className={styles.resumeList}>
-                      {form.projects.map((proj, idx) => (
-                        <li key={idx}>
-                          <div className={styles.resumeItemTitle}>{proj.name}</div>
-                          <div className={styles.resumeMeta}>{proj.dates}</div>
-                          <div>{proj.summary}</div>
-                          <div className={styles.resumeMeta}>{proj.tech}</div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                </div>
-              </div>
-            ) : (
-              <div ref={previewRef} className={styles.preview}>
-                <div className={styles.resumeHeader}>
-                  <div className={styles.resumeName}>{form.name}</div>
-                  <div className={styles.resumeTitle}>
-                    {form.title} - {form.location}
-                  </div>
-                  <div className={styles.resumeTitle}>
-                    {form.email} - {form.phone}
-                  </div>
-                </div>
-
-                <div className={styles.divider} />
-
-                <div className={styles.resumeSection}>
-                  <h4>PROFILE SUMMARY</h4>
-                  <div className={styles.resumeList} style={{ listStyle: "none", paddingLeft: 0 }}>
-                    <div>{form.summary}</div>
-                  </div>
-                </div>
-
-                <div className={styles.resumeTwoColumn}>
-                  <div>
-                    <div className={styles.resumeSection}>
-                      <h4>EXPERIENCE</h4>
-                      <ul className={styles.resumeList}>
-                        {form.experiences.map((exp, idx) => (
-                          <li key={idx}>
-                            <div className={styles.resumeItemTitle}>
-                              {exp.role} - {exp.company}
-                            </div>
-                            <div>{exp.dates}</div>
-                            <ul className={styles.resumeList}>
-                              {exp.bullets.map((b, i) => (
-                                <li key={i}>{b}</li>
-                              ))}
-                            </ul>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className={styles.resumeSection}>
-                      <h4>EDUCATION</h4>
-                      <ul className={styles.resumeList}>
-                        {form.education.map((edu, idx) => (
-                          <li key={idx}>
-                            <div className={styles.resumeItemTitle}>{edu.school}</div>
-                            <div>{edu.degree}</div>
-                            <div>{edu.dates}</div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className={styles.resumeSection}>
-                      <h4>PROJECTS</h4>
-                      <ul className={styles.resumeList}>
-                        {form.projects.map((proj, idx) => (
-                          <li key={idx}>
-                            <div className={styles.resumeItemTitle}>{proj.name}</div>
-                            <div className={styles.resumeMeta}>{proj.dates}</div>
-                            <div>{proj.summary}</div>
-                            <div className={styles.resumeMeta}>{proj.tech}</div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                  <div>
-                    <div className={styles.resumeSection}>
-                      <h4>SKILLS & ABILITIES</h4>
-                      <ul className={styles.resumeList}>
-                        {form.skills.map((skill, idx) => (
-                          <li key={idx}>{skill}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className={styles.resumeSection}>
-                      <h4>LANGUAGES</h4>
-                      <ul className={styles.resumeList}>
-                        {form.languages.map((lang, idx) => (
-                          <li key={idx}>{lang}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {previewTemplate === "navy"
+              ? renderNavyTemplate()
+              : previewTemplate === "clean"
+              ? renderCleanTemplate()
+              : renderSlateTemplate()}
+              
+              <button
+                type="button"
+                className={`btn-primary ${styles.downloadResume}`}
+                title="Save and Download PDF"
+                onClick={saveDownloadResume}
+              >
+                  Save and Download
+                </button>
           </div>
         </div>
       </>

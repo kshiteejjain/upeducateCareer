@@ -9,10 +9,10 @@ type IncomingUser = {
   email?: string;
   password?: string;
   mobileNumber?: string;
-  courseName?: string;
-  courseDuration?: string;
-  courseStartDate?: string;
+  subject?: string;
+  board?: string;
   createdAt?: string;
+  registeredAt?: string;
 };
 
 const formatTimestampIST = () => {
@@ -81,11 +81,10 @@ export default async function handler(
       password: user.password?.trim() || "apple@123",
       role: "student",
       mobileNumber: user.mobileNumber?.trim() || "",
-      courseName: user.courseName?.trim() || "",
-      courseDuration: user.courseDuration?.trim() || "",
-      courseStartDate: user.courseStartDate?.trim() || "",
-      subject: "",
+      subject: user.subject?.trim() || "",
+      board: user.board?.trim() || "",
       createdAt: user.createdAt?.trim() || formatTimestampIST(),
+      registeredAt: user.registeredAt?.trim() || formatTimestampIST(),
     };
 
     await setDoc(userRef, payload);

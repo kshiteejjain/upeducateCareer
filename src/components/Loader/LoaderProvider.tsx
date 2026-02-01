@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -18,15 +19,25 @@ const LoaderContext = createContext<LoaderContextValue | null>(null);
 
 export function LoaderProvider({ children }: { children: React.ReactNode }) {
   const [pending, setPending] = useState(0);
+  const [message, setMessage] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const startLoading = useCallback((_message?: string) => {
+  const startLoading = useCallback((nextMessage?: string) => {
     setPending((count) => count + 1);
+    if (nextMessage) {
+      setMessage(nextMessage);
+    }
   }, []);
 
   const stopLoading = useCallback(() => {
     setPending((count) => Math.max(0, count - 1));
   }, []);
+
+  useEffect(() => {
+    if (pending === 0) {
+      setMessage(null);
+    }
+  }, [pending]);
 
   const withLoader = useCallback(
     async <T,>(operation: () => Promise<T>, message?: string) => {
@@ -53,7 +64,7 @@ export function LoaderProvider({ children }: { children: React.ReactNode }) {
   return (
     <LoaderContext.Provider value={value}>
       {children}
-      <Loader active={pending > 0} />
+      <Loader active={pending > 0} message={message} />
     </LoaderContext.Provider>
   );
 }

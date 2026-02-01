@@ -8,10 +8,9 @@ type RegisterRequestBody = {
   name?: string;
   email?: string;
   password?: string;
-  courseName?: string;
-  courseDuration?: string;
-  courseStartDate?: string;
   mobileNumber?: string;
+  subject?: string;
+  board?: string;
 };
 
 export default async function handler(
@@ -29,6 +28,8 @@ export default async function handler(
     email,
     password,
     mobileNumber = "",
+    subject = "",
+    board = "",
   } = req.body as RegisterRequestBody;
 
   if (!email || !password || !name || !role) {
@@ -53,10 +54,10 @@ export default async function handler(
       email,
       password,
       mobileNumber: mobileNumber,
-      courseName: role === "student" ? (req.body as RegisterRequestBody).courseName : "",
-      courseDuration: role === "student" ? (req.body as RegisterRequestBody).courseDuration : "",
-      courseStartDate: role === "student" ? (req.body as RegisterRequestBody).courseStartDate : "",
+      subject: subject.trim(),
+      board: board.trim(),
       createdAt: serverTimestamp(),
+      registeredAt: serverTimestamp(),
     });
 
     return res.status(201).json({ message: "User registered successfully." });

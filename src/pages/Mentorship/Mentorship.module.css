@@ -15,7 +15,7 @@
 .header h1 {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--color-111827);
+  color: var(--color-gray);
   margin-bottom: 12px;
 }
 
@@ -202,7 +202,7 @@
 .mentorCard h3 {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--color-111827);
+  color: var(--color-gray);
   margin-bottom: 4px;
 }
 
@@ -274,7 +274,7 @@
 .detailsSection h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-111827);
+  color: var(--color-gray);
   margin-bottom: 8px;
 }
 
@@ -391,7 +391,7 @@
 
 .previewValue {
   font-weight: 700;
-  color: var(--color-111827);
+  color: var(--color-gray);
 }
 
 .form {
@@ -412,7 +412,7 @@
 }
 
 .formGroup label {
-  color: var(--color-111827);
+  color: var(--color-gray);
   font-size: 0.9rem;
 }
 
@@ -462,7 +462,7 @@
 .confirmationSection h2 {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--color-111827);
+  color: var(--color-gray);
   margin-bottom: 8px;
 }
 
@@ -490,7 +490,7 @@
 .detailsGroup h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-111827);
+  color: var(--color-gray);
   margin-bottom: 12px;
 }
 
@@ -512,7 +512,7 @@
 }
 
 .value {
-  color: var(--color-111827);
+  color: var(--color-gray);
   font-weight: 600;
 }
 
@@ -528,7 +528,7 @@
 .nextSteps h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-111827);
+  color: var(--color-gray);
   margin-bottom: 12px;
 }
 
@@ -581,7 +581,7 @@
 .backBtn {
   background: white;
   border: 2px solid #e5e7eb;
-  color: var(--color-111827);
+  color: var(--color-gray);
 }
 
 .backBtn:hover {

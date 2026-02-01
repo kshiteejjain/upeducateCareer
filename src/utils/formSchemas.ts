@@ -5,9 +5,8 @@ export type RegisterFormRecord = {
   name: string;
   email: string;
   password: string;
-  courseName: string;
-  courseDuration: string;
-  courseStartDate: string;
+  subject: string;
+  board: string;
   mobileNumber: string;
 };
 
@@ -19,9 +18,8 @@ export const registerFormSchema: Schema<RegisterFormRecord> = {
     name: "",
     email: "",
     password: "",
-    courseName: "",
-    courseDuration: "",
-    courseStartDate: "",
+    subject: "",
+    board: "",
     mobileNumber: "",
   },
 };
@@ -31,11 +29,11 @@ export type RegisterRecord = {
   name: string;
   email: string;
   password: string;
-  courseName: string;
-  courseDuration: string;
-  courseStartDate: string;
+  subject: string;
+  board: string;
   mobileNumber: string;
   createdAt: string;
+  registeredAt?: string;
 };
 
 export const registerSchema: Schema<RegisterRecord> = {
@@ -46,11 +44,11 @@ export const registerSchema: Schema<RegisterRecord> = {
     name: "",
     email: "",
     password: "",
-    courseName: "",
-    courseDuration: "",
-    courseStartDate: "",
+    subject: "",
+    board: "",
     mobileNumber: "",
     createdAt: "",
+    registeredAt: "",
   },
 };
 

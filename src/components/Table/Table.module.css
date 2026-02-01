@@ -72,13 +72,13 @@
 }
 
 .pageButtonActive {
-  background: var(--color-blue);
+  background: var(--color-primary);
   color: var(--color-white);
   border-color: var(--color-2a5298);
 }
 
 .pageButton:disabled {
-  background: var(--color-ccc);
+  background: var(--color-gray);
   color: var(--color-text);
   cursor: not-allowed;
 }

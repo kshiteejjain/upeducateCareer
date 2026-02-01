@@ -116,7 +116,7 @@ export default function Login() {
               />
               <div className={styles.forgotPassword}>
               <span
-                  className={styles.forgotPasswordLink}
+                  className="link"
                   onClick={() => router.push("/login/forgot-password")}
                 >
                   Forgot password?
@@ -143,11 +143,11 @@ export default function Login() {
 
           <p className={styles.terms}>
             By continuing, you agree to our{" "}
-            <a href="#" className={styles.link}>
+            <a href="#" className="link">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className={styles.link}>
+            <a href="#" className="link">
               Privacy Policy
             </a>
             .

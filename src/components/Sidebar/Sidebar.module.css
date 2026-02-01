@@ -62,7 +62,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 10px 20px;
-  border-bottom: 1px solid var(--color-e5e7eb);
+  border-bottom: 1px solid var(--color-blue-gray);
 }
 
 /* Active fix cleanup */

@@ -8,11 +8,10 @@ type Member = {
   email?: string;
   mobileNumber?: string;
   role?: string;
-  courseName?: string;
-  courseDuration?: string;
-  courseStartDate?: string;
   createdAt?: string;
+  registeredAt?: string;
   subject?: string;
+  board?: string;
   userId?: string;
 };
 
@@ -47,8 +46,8 @@ export default async function handler(
     const members: Member[] = snapshot.docs.map((docSnap) => {
       const data = docSnap.data();
       const createdAt =
+        normalizeDate(data.registeredAt) ||
         normalizeDate(data.createdAt) ||
-        normalizeDate(data.courseStartDate) ||
         normalizeDate(data.createdAt?.seconds ? data.createdAt : undefined);
 
       return {
@@ -57,11 +56,10 @@ export default async function handler(
         email: data.email ?? docSnap.id,
         role: data.role ?? "NA",
         mobileNumber: data.mobileNumber ?? "",
-        courseName: data.courseName ?? "",
-        courseDuration: data.courseDuration ?? "",
-        courseStartDate: normalizeDate(data.courseStartDate),
         createdAt,
+        registeredAt: normalizeDate(data.registeredAt),
         subject: data.subject ?? "",
+        board: data.board ?? "",
         userId: data.userId ?? docSnap.id,
       };
     });

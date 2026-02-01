@@ -1,0 +1,283 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px 48px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-black);
+  margin-bottom: 8px;
+}
+
+.header p {
+  color: var(--color-text);
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+}
+
+.chatShell {
+  background: var(--color-white);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.messages {
+  padding: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.messageRow {
+  display: flex;
+  margin-bottom: 18px;
+}
+
+.messageRow:last-child {
+  margin-bottom: 0;
+}
+
+.assistant {
+  justify-content: flex-start;
+}
+
+.user {
+  justify-content: flex-end;
+}
+
+.messageBubble {
+  max-width: 70%;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #eef4ff;
+  color: #1f2a44;
+  position: relative;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.user .messageBubble,
+.userBubble {
+  background: #0071c5;
+  color: #ffffff;
+}
+
+.coachBubble {
+  background: #eef4ff;
+  color: #1f2a44;
+}
+
+.roleTag {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.roleUser {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.roleCoach {
+  color: rgba(31, 42, 68, 0.7);
+}
+
+.messageBubble p {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.messageContent {
+  display: grid;
+  gap: 10px;
+}
+
+.messageUser {
+  background: transparent;
+}
+
+.messageCoach {
+  color: var(--color-text);
+}
+
+.messageContent p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.messageContent h1,
+.messageContent h2,
+.messageContent h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.messageContent ul,
+.messageContent ol {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+}
+
+.messageContent li {
+  line-height: 1.5;
+}
+
+.messageContent strong {
+  font-weight: 700;
+}
+
+.thinking {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.composer {
+  display: flex;
+  gap: 16px;
+  padding: 20px 24px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f9fafc;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.inputWrapper {
+  flex: 1 1 420px;
+}
+
+.textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 113, 197, 0.15);
+}
+
+.textarea:disabled {
+  background: #eef2f7;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.primaryBtn {
+  background: #0071c5;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 113, 197, 0.3);
+}
+
+.stopBtn,
+.secondaryBtn {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.stopBtn {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.stopBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.secondaryBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.roleCoach .messageContent{
+  color: var(--color-text);
+}
+
+@media (max-width: 900px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .messages {
+    max-height: 55vh;
+  }
+
+  .messageBubble {
+    max-width: 85%;
+  }
+}
+
+@media (max-width: 640px) {
+  .composer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .primaryBtn,
+  .stopBtn,
+  .secondaryBtn {
+    width: 100%;
+  }
+}

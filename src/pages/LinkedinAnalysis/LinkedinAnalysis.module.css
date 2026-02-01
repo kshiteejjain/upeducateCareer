@@ -15,13 +15,11 @@
 .header h1 {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--color-111827);
   margin-bottom: 12px;
 }
 
 .header p {
   font-size: 1rem;
-  color: var(--color-6b7280);
 }
 
 /* Input Section */
@@ -48,7 +46,6 @@
 
 .label {
   font-weight: 600;
-  color: var(--color-111827);
   font-size: 0.95rem;
 }
 
@@ -74,14 +71,12 @@
 
 .hint {
   font-size: 0.8rem;
-  color: var(--color-6b7280);
   margin: 0;
 }
 
 .submitBtn {
   padding: 12px 32px;
   background: linear-gradient(135deg, #0a66c2, #004182);
-  color: white;
   border: none;
   border-radius: 8px;
   font-weight: 700;
@@ -107,7 +102,6 @@
   border-left: 4px solid #dc2626;
   padding: 12px 16px;
   border-radius: 6px;
-  color: #991b1b;
   font-size: 0.9rem;
 }
 
@@ -137,6 +131,75 @@
   border-top: 4px solid #0a66c2;
 }
 
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.aiCardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.summaryCard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summaryLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summaryValue {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.summarySubtext {
+  font-size: 0.8rem;
+}
+
+.cardText {
+  margin: 6px 0 0 0;
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+.cardList {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.cardTag {
+  background: #f3f4f6;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .scoreDisplay {
   display: flex;
   gap: 40px;
@@ -163,7 +226,6 @@
 
 .scoreMax {
   font-size: 0.9rem;
-  color: var(--color-6b7280);
   font-weight: 500;
 }
 
@@ -174,7 +236,6 @@
 }
 
 .scoreDescription {
-  color: var(--color-6b7280);
   font-size: 0.95rem;
   line-height: 1.6;
   margin-bottom: 16px;
@@ -182,7 +243,6 @@
 
 .improvementBtn {
   display: inline-block;
-  color: #0a66c2;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
@@ -190,7 +250,6 @@
 }
 
 .improvementBtn:hover {
-  color: #004182;
   text-decoration: underline;
 }
 
@@ -200,6 +259,88 @@
   grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   gap: 24px;
   margin-bottom: 40px;
+}
+
+.aiSection {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid #0a66c2;
+}
+
+.aiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.aiHeader h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.aiScore {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(10, 102, 194, 0.1);
+  font-weight: 700;
+}
+
+.aiScoreLabel {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.aiScoreValue {
+  font-size: 1rem;
+}
+
+.aiRationale {
+  margin: 0 0 16px 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.aiBlock {
+  margin-top: 18px;
+}
+
+.aiBlock h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.aiBlock ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.aiBlock p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.aiKeywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.aiKeyword {
+  background: #f3f4f6;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .section {
@@ -251,7 +392,6 @@
 .sectionHeader h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--color-111827);
   margin: 0;
 }
 
@@ -273,6 +413,12 @@
   gap: 8px;
 }
 
+.itemInlineText {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .checkmark {
   display: inline-flex;
   align-items: center;
@@ -280,7 +426,6 @@
   width: 24px;
   height: 24px;
   background: #d1fae5;
-  color: #065f46;
   border-radius: 50%;
   font-weight: 700;
   font-size: 0.9rem;
@@ -293,7 +438,6 @@
   width: 24px;
   height: 24px;
   background: #fee2e2;
-  color: #991b1b;
   border-radius: 50%;
   font-weight: 700;
   font-size: 0.9rem;
@@ -315,14 +459,12 @@
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-111827);
   margin-left: auto;
 }
 
 .itemText {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--color-374151);
   line-height: 1.5;
 }
 
@@ -337,14 +479,12 @@
 .suggestion strong {
   display: block;
   font-size: 0.85rem;
-  color: var(--color-111827);
   margin-bottom: 6px;
 }
 
 .suggestion p {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--color-374151);
   font-style: italic;
   line-height: 1.5;
 }
@@ -361,7 +501,6 @@
 .actionSection h2 {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--color-111827);
   margin-bottom: 24px;
 }
 
@@ -395,20 +534,17 @@
 .actionCard h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-111827);
   margin-bottom: 8px;
 }
 
 .actionCard p {
   font-size: 0.9rem;
-  color: var(--color-6b7280);
   margin-bottom: 16px;
   line-height: 1.5;
 }
 
 .actionLink {
   display: inline-block;
-  color: #0a66c2;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
@@ -417,7 +553,6 @@
 }
 
 .actionLink:hover {
-  color: #004182;
   text-decoration: underline;
 }
 
@@ -430,7 +565,6 @@
 .analyzeAnotherBtn {
   background: white;
   border: 2px solid #0a66c2;
-  color: #0a66c2;
   padding: 12px 28px;
   border-radius: 8px;
   font-weight: 700;
@@ -441,7 +575,6 @@
 
 .analyzeAnotherBtn:hover {
   background: #0a66c2;
-  color: white;
 }
 
 /* Responsive */
@@ -485,6 +618,14 @@
 
   .scoreValue {
     font-size: 2.5rem;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .aiCardGrid {
+    grid-template-columns: 1fr;
   }
 
   .actionGrid {

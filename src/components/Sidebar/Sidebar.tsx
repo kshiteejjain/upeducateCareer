@@ -7,13 +7,13 @@ import styles from "./Sidebar.module.css";
 
 const menuItems = [
   { name: "Dashboard", path: "/Dashboard", icon: "📊" },
-  { name: "Job Search", path: "/Projects", icon: "🔍" },
-  { name: "Job Board", path: "/ViewJobs", icon: "🗂️" },
+  { name: "Job Search", path: "/ViewJobs", icon: "🗂️" },
   { name: "Resume Builder", path: "/ResumeBuilder", icon: "📄" },
   { name: "LinkedIn Profile Analysis", path: "/LinkedinAnalysis", icon: "🔗" },
   { name: "Schedule 1:1 Meet", path: "/Mentorship", icon: "📅" },
   { name: "Assessment", path: "/", icon: "📝" },
   { name: "AI Interview", path: "/InterviewQuestions", icon: "🤖" },
+  { name: "Chat with AI Coach", path: "/AIChat", icon: "✨" },
   { name: "Discussions", path: "/Discussions", icon: "💬" },
   { name: "Bulk Upload", path: "/Upload", icon: "📤" }
 ];
@@ -45,7 +45,6 @@ export default function Sidebar() {
       <div className={styles.logo}>
         <Image src="/logo.svg" alt="Logo" width={200} height={48} priority />
       </div>
-
       <ul className={styles.menuList}>
         {visibleItems.map((item) => {
           const isProjects =
@@ -57,7 +56,9 @@ export default function Sidebar() {
               key={item.name}
               className={`${styles.menuItem} ${isActive ? styles.active : ""}`}
             >
-              <Link href={item.path}> {item.icon} {item.name}</Link>
+              <Link href={item.path}>
+                {item.icon} {item.name}
+              </Link>
             </li>
           );
         })}
@@ -65,3 +66,4 @@ export default function Sidebar() {
     </aside>
   );
 }
+
