@@ -47,7 +47,7 @@ const renderMarkdown = (content: string) => {
     if (/^#{1,3}\s+/.test(line)) {
       const level = Math.min(3, (line.match(/^#+/)?.[0].length ?? 1));
       const text = line.replace(/^#{1,3}\s+/, "");
-      const Tag = `h${level}` as const;
+      const Tag = (level === 1 ? "h1" : level === 2 ? "h2" : "h3") as const;
       blocks.push(
         <Tag key={`h-${index++}`}>{renderInline(text)}</Tag>
       );
