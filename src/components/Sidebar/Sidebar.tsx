@@ -13,7 +13,7 @@ const menuItems = [
   { name: "Schedule 1:1 Meet", path: "/Mentorship", icon: "📅" },
   { name: "Assessment", path: "/", icon: "📝" },
   { name: "AI Interview", path: "/InterviewQuestions", icon: "🤖" },
-  { name: "Chat with AI Coach", path: "/AIChat", icon: "✨" },
+  { name: "Ask Anu - Your AI Coach", path: "/AskAnu", icon: "/shiksha.png" },
   { name: "Discussions", path: "/Discussions", icon: "💬" },
   { name: "Bulk Upload", path: "/Upload", icon: "📤" }
 ];
@@ -57,7 +57,17 @@ export default function Sidebar() {
               className={`${styles.menuItem} ${isActive ? styles.active : ""}`}
             >
               <Link href={item.path}>
-                {item.icon} {item.name}
+                {item.icon.startsWith("/") ? (
+                  <Image
+                    src={item.icon}
+                    alt=""
+                    width={18}
+                    height={18}
+                  />
+                ) : (
+                  item.icon
+                )}{" "}
+                {item.name}
               </Link>
             </li>
           );
@@ -66,4 +76,3 @@ export default function Sidebar() {
     </aside>
   );
 }
-

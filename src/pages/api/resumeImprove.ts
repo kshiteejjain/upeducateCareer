@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { createChatCompletion, OpenAIRequestError } from "@/utils/openai";
 
 type AiResumeResult = {
   score: number;
@@ -23,12 +24,6 @@ type AiResumeResult = {
     projects: { name: string; dates: string; summary: string; tech: string }[];
   };
 };
-
-const aiUpstreamUrl =
-  process.env.GENERATE_CONTENT_API_URL ||
-  process.env.NEXT_PUBLIC_GENERATE_CONTENT_API_URL ||
-  process.env.REACT_APP_GENERATE_CONTENT_API_URL ||
-  "";
 
 const buildPrompt = (text: string) => {
   return [
@@ -77,10 +72,6 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  if (!aiUpstreamUrl) {
-    return res.status(500).json({ message: "Missing GENERATE_CONTENT_API_URL" });
-  }
-
   const text = typeof req.body?.text === "string" ? req.body.text.trim() : "";
   if (!text || text.replace(/\s/g, "").length < 50) {
     return res.status(400).json({ message: "Resume text is required." });
@@ -88,24 +79,17 @@ export default async function handler(
 
   try {
     const prompt = buildPrompt(text);
-    const response = await fetch(`${aiUpstreamUrl}/generateContent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({
-        message: `AI upstream error: ${response.status} - ${errText}`,
-      });
-    }
-
-    const data = (await response.json()) as { content?: string };
-    const content = data.content?.trim() || "";
-    const parsed = parseJson(content);
+    const result = await createChatCompletion(prompt);
+    const parsed = parseJson(result.content);
     return res.status(200).json(parsed);
   } catch (error) {
+    if (error instanceof OpenAIRequestError) {
+      console.error("resumeImprove failed", {
+        status: error.status,
+        details: error.details,
+      });
+      return res.status(error.status).json({ message: error.message });
+    }
     console.error("resumeImprove failed", error);
     const message = error instanceof Error ? error.message : "Failed to improve resume.";
     return res.status(500).json({ message });

@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { createChatCompletion, OpenAIRequestError } from "@/utils/openai";
 
 type AnalysisItem = {
   type: "positive" | "negative" | "suggestion";
@@ -42,12 +43,6 @@ type AiRequest = {
   profileData: ProfileInput;
   sections: AnalysisSection[];
 };
-
-const aiUpstreamUrl =
-  process.env.GENERATE_CONTENT_API_URL ||
-  process.env.NEXT_PUBLIC_GENERATE_CONTENT_API_URL ||
-  process.env.REACT_APP_GENERATE_CONTENT_API_URL ||
-  "";
 
 const clip = (value: string, max: number) =>
   value.length > max ? `${value.slice(0, max)}...` : value;
@@ -110,10 +105,6 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  if (!aiUpstreamUrl) {
-    return res.status(500).json({ message: "Missing GENERATE_CONTENT_API_URL" });
-  }
-
   const body = (req.body ?? {}) as AiRequest;
   if (!body.profileData || !Array.isArray(body.sections)) {
     return res.status(400).json({ message: "profileData and sections are required." });
@@ -121,24 +112,18 @@ export default async function handler(
 
   try {
     const prompt = buildAiPrompt(body);
-    const response = await fetch(`${aiUpstreamUrl}/generateContent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({
-        message: `AI upstream error: ${response.status} - ${errText}`,
-      });
-    }
-
-    const data = (await response.json()) as { content?: string };
-    const content = data.content?.trim() || "";
+    const result = await createChatCompletion(prompt);
+    const content = result.content;
     const parsed = parseAiJson(content);
     return res.status(200).json(parsed);
   } catch (error) {
+    if (error instanceof OpenAIRequestError) {
+      console.error("LinkedIn AI analysis failed", {
+        status: error.status,
+        details: error.details,
+      });
+      return res.status(error.status).json({ message: error.message });
+    }
     console.error("LinkedIn AI analysis failed", error);
     const message =
       error instanceof Error ? error.message : "Failed to analyze profile with AI.";

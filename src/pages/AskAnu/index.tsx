@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import type { ReactElement } from "react";
 import Layout from "@/components/Layout/Layout";
-import styles from "./AIChat.module.css";
+import styles from "./AskAnu.module.css";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -26,7 +28,7 @@ const renderInline = (text: string) => {
 
 const renderMarkdown = (content: string) => {
   const lines = content.split(/\r?\n/);
-  const blocks: JSX.Element[] = [];
+  const blocks: ReactElement[] = [];
   let index = 0;
 
   const pushParagraph = (text: string) => {
@@ -96,7 +98,7 @@ const renderMarkdown = (content: string) => {
   return blocks;
 };
 
-export default function AIChat() {
+export default function AskAnu() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
@@ -127,7 +129,7 @@ export default function AIChat() {
     controllerRef.current = controller;
 
     try {
-      const response = await fetch("/api/aiChat", {
+      const response = await fetch("/api/aksAnu", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: userMessage.content }),
@@ -179,7 +181,10 @@ export default function AIChat() {
       <div className={styles.container}>
         <div className={styles.header}>
           <div>
-            <h1>AI Coach Chat</h1>
+            <div className={styles.titleRow}>
+              <Image src="/shiksha.png" alt="Anu" width={36} height={36} />
+              <h1>Ask Anu - Your AI Coach</h1>
+            </div>
             <p>Ask about resumes, interviews, learning paths, or career clarity.</p>
           </div>
           <div className={styles.headerActions}>
