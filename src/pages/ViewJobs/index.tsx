@@ -31,7 +31,7 @@ export default function ViewJobs() {
   const headers = ["Job Title", "Company", "Location", "Platform", "Posted", "Status", "Action"];
   const [jobs, setJobs] = useState<JobRow[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [role, setRole] = useState();
+  const [role, setRole] = useState("");
   const [country, setCountry] = useState("India");
   const [experience, setExperience] = useState("Any");
   const { withLoader } = useLoader();

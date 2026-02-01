@@ -394,7 +394,8 @@ export default function ResumeBuilder() {
         }
         setAiResult(data);
         if (data.parsedResume) {
-          const normalizedSkills = (data.parsedResume.skills || []).map((skill: any) =>
+          const parsedResume = data.parsedResume;
+          const normalizedSkills = (parsedResume.skills || []).map((skill: any) =>
             typeof skill === "string"
               ? { name: skill, rating: 3 }
               : {
@@ -404,11 +405,11 @@ export default function ResumeBuilder() {
           );
           setForm((prev) => ({
             ...prev,
-            ...data.parsedResume,
+            ...parsedResume,
             skills: normalizedSkills,
-            languages: data.parsedResume.languages || [],
-            experiences: data.parsedResume.experiences || [],
-            education: data.parsedResume.education || [],
+            languages: parsedResume.languages || [],
+            experiences: parsedResume.experiences || [],
+            education: parsedResume.education || [],
           }));
           setActiveTab("manual");
         }
