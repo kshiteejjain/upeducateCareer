@@ -33,9 +33,9 @@
 
 .form {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 1fr auto;
   gap: 16px;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .formGroup {
@@ -72,28 +72,6 @@
 .hint {
   font-size: 0.8rem;
   margin: 0;
-}
-
-.submitBtn {
-  padding: 12px 32px;
-  background: linear-gradient(135deg, #0a66c2, #004182);
-  border: none;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.submitBtn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(10, 102, 194, 0.3);
-}
-
-.submitBtn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }
 
 .error {

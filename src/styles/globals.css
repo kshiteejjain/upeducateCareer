@@ -116,13 +116,14 @@ a {
   }
 }
 
-ul li{
+ul li {
   color: var(--color-text);
 }
 
 p {
-  font-size:  var(--font-size-base);
+  font-size: var(--font-size-base);
   color: var(--color-text);
+  line-height: 28px;
 }
 
 /* Form group wrapper */
@@ -133,11 +134,12 @@ p {
   font-family: 'Ubuntu' !important;
 }
 
-input, textarea  {
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid var(--color-gray);
-    font-family: 'Ubuntu';
+input,
+textarea {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid var(--color-gray);
+  font-family: 'Ubuntu';
 }
 
 /* Label styling */
@@ -226,7 +228,7 @@ input:disabled {
 }
 
 .overlay {
-  background:#000000db;
+  background: #000000db;
   color: var(--color-white);
   padding: 60px;
   text-align: center;
@@ -248,6 +250,7 @@ input:disabled {
 .form-actions .btn {
   width: 49%;
 }
+
 .link {
   color: var(--color-primary);
   text-decoration: none;
@@ -257,4 +260,53 @@ input:disabled {
 
 .link:hover {
   text-decoration: underline;
+}
+
+.emptyState {
+  margin: 32px auto;
+  padding: 32px 24px;
+  width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.emptyState h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1d1f23;
+}
+
+.emptyState p {
+  margin: 0;
+  color: #5b5f69;
+}
+
+.emptyStateImage {
+  width: 400px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.toggle {
+  background-color: var(--color-gray);
+  color: var(--color-text);
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 6px 7px;
+  position: absolute;
+  top: 103px;
+  right: -22px;
+  left: auto;
+  border: none;
+}
+.toggle:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
 }

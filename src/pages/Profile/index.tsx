@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import Layout from "@/components/Layout/Layout";
@@ -13,11 +13,26 @@ export default function Profile() {
   const [mobileDraft, setMobileDraft] = useState("");
   const router = useRouter();
   const { withLoader, isLoading } = useLoader();
+  const storedProfile = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = window.localStorage.getItem("userJobPrefix");
+      if (!raw) return null;
+      return JSON.parse(raw) as Record<string, unknown>;
+    } catch (error) {
+      console.warn("Failed to parse stored user profile", error);
+      return null;
+    }
+  }, []);
 
   const fetchProfile = async (email: string) => {
     try {
       const res = await fetch(`/api/profile?email=${encodeURIComponent(email)}`);
       if (!res.ok) {
+        if (res.status === 404) {
+          setProfile(null);
+          return;
+        }
         const errorBody = await res.json().catch(() => ({}));
         throw new Error(
           (errorBody as { message?: string }).message ?? "Failed to load profile."
@@ -39,13 +54,20 @@ export default function Profile() {
   useEffect(() => {
     const existing = getSession();
     setSessionUser(existing);
+    if (storedProfile) {
+      setProfile(storedProfile);
+      if (typeof (storedProfile as Record<string, unknown>)?.mobileNumber === "string") {
+        setMobileDraft((storedProfile as Record<string, unknown>).mobileNumber as string);
+      }
+      return;
+    }
     if (existing?.email) {
       void withLoader(
         () => fetchProfile(existing.email),
         "Loading your profile data..."
       );
     }
-  }, [withLoader]);
+  }, [withLoader, storedProfile]);
 
   const handleSaveMobile = async () => {
     if (!sessionUser?.email) {
@@ -124,28 +146,40 @@ export default function Profile() {
           <section className={styles.grid}>
             <div className={`${styles.card} ${styles.glow}`}>
               <div className={styles.badge}>
-                {((profile as Record<string, unknown>)?.name as string)?.[0] ?? sessionUser.name?.[0] ?? "U"}
+                {((profile as Record<string, unknown>)?.name as string)?.[0] ??
+                  sessionUser?.name?.[0] ??
+                  "U"}
               </div>
               <h3 className={styles.cardTitle}>
-                {((profile as Record<string, unknown>)?.name as string) || sessionUser.name || "User"}
+                {((profile as Record<string, unknown>)?.name as string) ||
+                  sessionUser?.name ||
+                  "User"}
               </h3>
               <p className={styles.cardMeta}>
-                {((profile as Record<string, unknown>)?.email as string) || sessionUser.email}
+                {((profile as Record<string, unknown>)?.email as string) ||
+                  sessionUser?.email ||
+                  "Not available"}
               </p>
               <p className={styles.role}>
-                {((profile as Record<string, unknown>)?.role as string) || sessionUser.role || "Member"}
+                {((profile as Record<string, unknown>)?.role as string) ||
+                  sessionUser?.role ||
+                  "Member"}
               </p>
             </div>
 
             <div className={styles.card}>
               <h4 className={styles.label}>User ID</h4>
               <p className={styles.value}>
-                {((profile as Record<string, unknown>)?.userId as string) ?? sessionUser.userId ?? "Not available"}
+                {((profile as Record<string, unknown>)?.userId as string) ??
+                  sessionUser?.userId ??
+                  "Not available"}
               </p>
               <div className={styles.divider} />
               <h4 className={styles.label}>Role</h4>
               <p className={styles.value}>
-                {((profile as Record<string, unknown>)?.role as string) ?? sessionUser.role ?? "Member"}
+                {((profile as Record<string, unknown>)?.role as string) ??
+                  sessionUser?.role ??
+                  "Member"}
               </p>
             </div>
 

@@ -31,19 +31,24 @@
 }
 
 .tabButton {
-  border: 1px solid var(--color-d1d5db);
+  border: 1px solid var(--color-gray);
   background: var(--color-white);
-  color: var(--color-gray);
-  border-radius: 6px;
-  padding: 8px 14px;
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: 10px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px var(--color-rgba-0-0-0-004);
 }
 
 .tabActive {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  box-shadow: 0 2px 8px var(--color-rgba-0-0-0-008);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 6px 12px var(--color-rgba-0-0-0-008);
 }
 
 .accordion {
@@ -105,10 +110,13 @@
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  display: flex;
   gap: 16px;
-  align-items: start;
+  align-items: flex-start;
+}
+
+.layout > * {
+  flex: 1 1 0;
 }
 
 .card {
@@ -120,16 +128,16 @@
 }
 
 .uploadCard {
-  border: 1px dashed var(--color-d1d5db);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 20px;
   margin-bottom: 16px;
   background: var(--color-white);
+  box-shadow: 0 8px 18px var(--color-rgba-0-0-0-004);
 }
 
 .uploadHint {
   font-size: 13px;
-  color: var(--color-6b7280);
+  color: var(--color-text);
   margin: 4px 0 10px;
 }
 
@@ -138,10 +146,13 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  padding: 10px 14px;
-  border-radius: 5px;
+  padding: 18px;
+  border: 2px dashed var(--color-gray);
+  border-radius: 12px;
+  background: var(--color-white);
+  justify-content: center;
+  text-align: center;
+  margin-top: 30px;
 }
 
 .fileInputHidden {
@@ -152,12 +163,14 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 10px 16px;
   border-radius: 8px;
-  background: var(--color-primary);
-  color: var(--color-white);
+  background: var(--color-white);
+  color: var(--color-text);
+  border: 1px solid var(--color-e5e7eb);
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 2px 8px var(--color-rgba-0-0-0-004);
 }
 
 .fileInputSmall {
@@ -170,7 +183,11 @@
 
 .fileName {
   font-size: 13px;
-  color: var(--color-6b7280);
+  color: var(--color-text);
+}
+
+.uploadRow .fileName {
+  width: 100%;
 }
 
 .uploadStatus {
@@ -185,6 +202,16 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
+  color: var(--color-primary);
+}
+
+.uploadRow:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 6px 14px var(--color-rgba-0-0-0-004);
+}
+
+.fileButton:hover {
+  border-color: var(--color-primary);
   color: var(--color-primary);
 }
 
@@ -214,7 +241,7 @@
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 20px;
-  background: linear-gradient(180deg, var(--color-blue-gray), var(--color-white));
+  background-color: var(--color-blue-gray);
 }
 
 .aiHeader {
@@ -227,7 +254,7 @@
 .aiScore {
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-gray);
+  color: var(--color-primary);
   background: var(--color-blue-gray);
   padding: 4px 10px;
   border-radius: 999px;
@@ -235,20 +262,23 @@
 
 .aiSummary {
   margin: 8px 0 12px;
-  color: var(--color-374151);
+  color: var(--color-text);
   line-height: 1.6;
 }
 
+.aiBlock{
+  margin-bottom: 30px;
+}
 .aiBlock h4 {
-  margin: 12px 0 6px;
-  font-size: 13px;
-  color: var(--color-gray);
+  margin: 22px 0 10px 0;
+  font-size: calc(var(--font-size-base) + 1px);
+  color: var(--color-text);
 }
 
 .aiBlock ul {
   margin: 0;
   padding-left: 18px;
-  color: var(--color-374151);
+  color: var(--color-text);
   line-height: 1.6;
 }
 
@@ -260,17 +290,12 @@
 }
 
 .keywordTag {
-  background: var(--color-f3f4f6);
-  color: var(--color-gray);
+  background: var(--color-white);
+  color: var(--color-text);
+  border: 1px solid var(--color-gray);
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
-}
-
-.previewSub {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: var(--color-6b7280);
 }
 
 .previewActions {
@@ -288,6 +313,37 @@
   font-size: 13px;
 }
 
+.templateOptions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.templateOption {
+  border: 1px solid var(--color-gray);
+  background: var(--color-white);
+  color: var(--color-text);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.templateOption:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.templateOptionActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 6px 12px var(--color-rgba-0-0-0-008);
+}
+
 .cleanWrapper {
   border: 1px solid var(--color-e5e7eb);
   border-radius: 6px;
@@ -295,6 +351,7 @@
   background: var(--color-white);
   font-size: 13px;
   line-height: 1.6;
+  width: 716px;
 }
 
 .cleanHeader {
@@ -319,19 +376,30 @@
   flex-direction: column;
   gap: 4px;
   font-size: 12px;
-  color: var(--color-374151);
+  color: var(--color-text);
 }
 
 .cleanDivider {
   height: 1px;
-  background: var(--color-e5e7eb);
+  background: var(--color-gray);
   margin: 12px 0 16px;
 }
 
 .cleanGrid {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  display: flex;
   gap: 20px;
+}
+
+.cleanGrid > * {
+  flex: 1 1 0;
+}
+
+.cleanGrid > :first-child {
+  flex-basis: 60%;
+}
+
+.cleanGrid > :last-child {
+  flex-basis: 40%;
 }
 
 .cleanSection h4 {
@@ -352,17 +420,17 @@
 }
 
 .cleanItemMeta {
-  color: var(--color-6b7280);
+  color: var(--color-text);
   font-size: 12px;
 }
 
 .slateWrapper {
-  border: 1px solid var(--color-e5e7eb);
+  border: 1px solid var(--color-gray);
   border-radius: 10px;
   padding: 20px;
-  background: var(--color-blue-gray);
   font-size: 13px;
   line-height: 1.6;
+  width: 716px;
 }
 
 .slateHeader {
@@ -377,6 +445,14 @@
   height: 90px;
   border-radius: 12px;
   overflow: hidden;
+  background: var(--color-white);
+}
+
+.slatePhoto :global(img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .slateName {
@@ -401,9 +477,20 @@
 }
 
 .slateTwoCol {
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr;
+  display: flex;
   gap: 18px;
+}
+
+.slateTwoCol > * {
+  flex: 1 1 0;
+}
+
+.slateTwoCol > :first-child {
+  flex-basis: 65%;
+}
+
+.slateTwoCol > :last-child {
+  flex-basis: 35%;
 }
 
 .slateSection h4 {
@@ -425,7 +512,7 @@
 
 .slateItemMeta {
   font-size: 12px;
-  color: var(--color-6b7280);
+  color: var(--color-text);
 }
 
 .formHeader,
@@ -434,19 +521,24 @@
   justify-content: space-between;
   align-items: center;
   gap: 8px;
+  margin-bottom: 20px;
 }
 
 .sectionTitle {
   font-size: 1rem;
   font-weight: 500;
-  margin-bottom: 10px;
   color: var(--color-black);
 }
 
 .formGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+}
+
+.formGrid > * {
+  flex: 1 1 calc(50% - 6px);
+  min-width: 220px;
 }
 
 .formGroup {
@@ -530,7 +622,7 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--color-6b7280);
+  color: var(--color-text);
 }
 
 .skillRow {
@@ -572,7 +664,7 @@
 
 .resumeTitle {
   font-size: 14px;
-  color: var(--color-6b7280);
+  color: var(--color-text);
 }
 
 .resumeTitleSmall {
@@ -582,7 +674,7 @@
 
 .resumeMeta {
   font-size: 12px;
-  color: var(--color-6b7280);
+  color: var(--color-text);
 }
 
 .divider {
@@ -592,9 +684,12 @@
 }
 
 .resumeTwoColumn {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 20px;
+}
+
+.resumeTwoColumn > * {
+  flex: 1 1 0;
 }
 
 .resumeSection {
@@ -624,14 +719,22 @@
 }
 
 .navyWrapper {
-  display: grid;
-  grid-template-columns: 320px 1fr;
+  display: flex;
   background: var(--color-white);
   border: 1px solid var(--color-e5e7eb);
   border-radius: 5px;
   overflow: hidden;
   font-size: 13px;
   line-height: 1.6;
+  width: 716px;
+}
+
+.navyWrapper > :first-child {
+  flex: 0 0 320px;
+}
+
+.navyWrapper > :last-child {
+  flex: 1 1 0;
 }
 
 .navySidebar {
@@ -699,16 +802,16 @@
 
 @media (max-width: 960px) {
   .layout {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .navyWrapper {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .cleanGrid,
   .slateTwoCol {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .previewActions {
@@ -735,7 +838,7 @@
     background: #fff;
   }
   .layout {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
   .previewCard,
   .preview,

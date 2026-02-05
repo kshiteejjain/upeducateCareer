@@ -37,11 +37,18 @@ type AiAnalysis = {
     skills?: string[];
   };
   suggestedKeywords: string[];
+  targetRoleInsights?: {
+    roleSummary?: string;
+    growth?: string;
+    marketValue?: string;
+    jobInsights?: string[];
+  };
 };
 
 type AiRequest = {
   profileData: ProfileInput;
   sections: AnalysisSection[];
+  targetRole?: string;
 };
 
 const clip = (value: string, max: number) =>
@@ -60,6 +67,7 @@ const buildAiPrompt = (payload: AiRequest) => {
   return [
     "You are an expert LinkedIn profile coach.",
     "Provide AI-based scoring, recommendations, and concrete modifications.",
+    "Also provide target role insights based on the current profile and the target role.",
     "Use the provided data only; do not invent roles, dates, or companies.",
     "Return STRICT JSON only, no extra text, using this schema:",
     `{
@@ -72,8 +80,15 @@ const buildAiPrompt = (payload: AiRequest) => {
     "experienceBullets": ["bullet1","bullet2","bullet3","bullet4"],
     "skills": ["skill1","skill2","skill3","skill4","skill5","skill6","skill7","skill8","skill9","skill10","skill11","skill12"]
   },
-  "suggestedKeywords": ["keyword1","keyword2","keyword3","keyword4","keyword5","keyword6","keyword7","keyword8"]
+  "suggestedKeywords": ["keyword1","keyword2","keyword3","keyword4","keyword5","keyword6","keyword7","keyword8"],
+  "targetRoleInsights": {
+    "roleSummary": "2-3 sentences about the target role",
+    "growth": "1-2 sentences about role growth and demand",
+    "marketValue": "1-2 sentences about market value and typical hiring demand",
+    "jobInsights": ["insight1","insight2","insight3","insight4"]
+  }
 }`,
+    `Target role: ${clip(payload.targetRole || "", 120) || "Not provided"}`,
     "Profile data:",
     JSON.stringify(
       {
@@ -108,6 +123,9 @@ export default async function handler(
   const body = (req.body ?? {}) as AiRequest;
   if (!body.profileData || !Array.isArray(body.sections)) {
     return res.status(400).json({ message: "profileData and sections are required." });
+  }
+  if (!body.targetRole || !body.targetRole.trim()) {
+    return res.status(400).json({ message: "targetRole is required." });
   }
 
   try {

@@ -21,14 +21,18 @@ const fetchJson = async <T>(url: string, headers?: Record<string, string>) => {
 
 const mapJSearch = (data: Record<string, unknown>): JobItem[] => {
   const jobs = (data?.data as Record<string, unknown>[]) || [];
-  return jobs.map((job, idx) => {
+  return jobs.flatMap((job, idx) => {
+    const jobId = job.job_id as string | undefined;
+    if (!jobId) {
+      return [];
+    }
     const city = job.job_city as string | undefined;
     const state = job.job_state as string | undefined;
     const country = job.job_country as string | undefined;
     const location = [city, state, country].filter(Boolean).join(", ") || "Unknown";
 
     return {
-      id: `jsearch-${(job.job_id as string) ?? idx}`,
+      id: jobId,
       title: (job.job_title as string) ?? "Untitled",
       company: (job.employer_name as string) ?? "Unknown",
       location,
@@ -36,7 +40,7 @@ const mapJSearch = (data: Record<string, unknown>): JobItem[] => {
       platform: (job.job_publisher as string) ?? "RapidAPI JSearch",
       status: "Open",
       applyUrl: (job.job_apply_link as string) ?? "#",
-    };
+    } satisfies JobItem;
   });
 };
 
@@ -68,18 +72,22 @@ export default async function handler(
       return res.status(500).json({ message: "Missing RAPIDAPI_KEY" });
     }
 
-    const { search, pages } = req.query;
+    const { search, pages, page } = req.query;
     const query = typeof search === "string" && search.trim()
       ? search.trim()
       : "teacher jobs in india";
-    const requestedPages = typeof pages === "string" ? Number(pages) : 5;
+    const requestedPages = typeof pages === "string" ? Number(pages) : Number.NaN;
+    const requestedPage = typeof page === "string" ? Number(page) : Number.NaN;
     const numPages = Number.isFinite(requestedPages) && requestedPages > 0
-      ? Math.min(Math.max(Math.floor(requestedPages), 1), 10)
-      : 5;
+      ? Math.floor(requestedPages)
+      : 1;
+    const pageNumber = Number.isFinite(requestedPage) && requestedPage > 0
+      ? Math.floor(requestedPage)
+      : 1;
 
     const url = new URL("https://jsearch.p.rapidapi.com/search");
     url.searchParams.set("query", query);
-    url.searchParams.set("page", "1");
+    url.searchParams.set("page", String(pageNumber));
     url.searchParams.set("num_pages", String(numPages));
 
     const result = await fetchJson<Record<string, unknown>>(url.toString(), {

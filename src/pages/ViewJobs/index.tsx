@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Layout from "@/components/Layout/Layout";
-import Table from "@/components/Table/Table";
 import styles from "./ViewJobs.module.css";
 import headerStyles from "../Projects/AddProject.module.css";
 import { useLoader } from "@/components/Loader/LoaderProvider";
@@ -28,13 +28,51 @@ const formatDate = (value?: string) => {
 };
 
 export default function ViewJobs() {
-  const headers = ["Job Title", "Company", "Location", "Platform", "Posted", "Status", "Action"];
   const [jobs, setJobs] = useState<JobRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [role, setRole] = useState("");
-  const [country, setCountry] = useState("India");
+  const [city, setCity] = useState("");
   const [experience, setExperience] = useState("Any");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { withLoader } = useLoader();
+  const storageKey = "viewJobsState";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = window.sessionStorage.getItem(storageKey);
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved) as {
+        jobs?: JobRow[];
+        role?: string;
+        city?: string;
+        experience?: string;
+        currentPage?: number;
+      };
+      if (parsed.jobs && parsed.jobs.length > 0) {
+        setJobs(parsed.jobs);
+        setRole(parsed.role ?? "");
+        setCity(parsed.city ?? "");
+        setExperience(parsed.experience ?? "Any");
+        setCurrentPage(parsed.currentPage ?? 1);
+      }
+    } catch (err) {
+      console.error("Failed to read saved job state", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const payload = JSON.stringify({
+      jobs,
+      role,
+      city,
+      experience,
+      currentPage,
+    });
+    window.sessionStorage.setItem(storageKey, payload);
+  }, [jobs, role, city, experience, currentPage]);
 
   const fetchJobs = useCallback(async (query: string, loaderText: string) => {
     await withLoader(async () => {
@@ -42,12 +80,14 @@ export default function ViewJobs() {
         const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
         const url = new URL(`${apiBaseUrl}/api/jobs`, window.location.origin);
         url.searchParams.set("search", query);
-        url.searchParams.set("pages", "5");
+        url.searchParams.set("page", "1");
+        url.searchParams.set("pages", "1");
         const response = await fetch(url.toString());
         if (!response.ok) throw new Error(`Failed to load jobs (${response.status})`);
         const result = (await response.json()) as { jobs?: JobRow[]; message?: string };
         if (!result.jobs) throw new Error(result.message || "No jobs returned");
         setJobs(result.jobs);
+        setCurrentPage(1);
       } catch (err) {
         console.error("Jobs fetch failed", err);
         setError(err instanceof Error ? err.message : "Failed to load jobs");
@@ -55,38 +95,50 @@ export default function ViewJobs() {
     }, loaderText);
   }, [withLoader]);
 
+  const fetchMoreJobs = useCallback(async (query: string, nextPage: number) => {
+    try {
+      setIsLoadingMore(true);
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+      const url = new URL(`${apiBaseUrl}/api/jobs`, window.location.origin);
+      url.searchParams.set("search", query);
+      url.searchParams.set("page", String(nextPage));
+      url.searchParams.set("pages", "1");
+      const response = await fetch(url.toString());
+      if (!response.ok) throw new Error(`Failed to load jobs (${response.status})`);
+      const result = (await response.json()) as { jobs?: JobRow[]; message?: string };
+      if (!result.jobs) throw new Error(result.message || "No jobs returned");
+      const nextJobs = result.jobs ?? [];
+      setJobs((prev) => [...prev, ...nextJobs]);
+      setCurrentPage(nextPage);
+    } catch (err) {
+      console.error("Jobs fetch failed", err);
+      setError(err instanceof Error ? err.message : "Failed to load jobs");
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, []);
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     const experienceText = experience !== "Any" ? `${experience} experience` : "";
-    const query = [role, "jobs", country ? `in ${country}` : "", experienceText]
+    const query = [role, "jobs", city ? `in ${city}` : "", experienceText]
       .filter(Boolean)
       .join(" ");
     await fetchJobs(query, "Searching jobs...");
   };
 
-  const tableRows = useMemo(
-    () =>
-      jobs.map((job) => ({
-        "Job Title": job.title,
-        Company: job.company,
-        Location: job.location,
-        Platform: job.platform,
-        Posted: formatDate(job.postedAt),
-        Status: job.status || "Open",
-        statusText: job.status || "Open",
-        Action: (
-          <a
-            href={job.applyUrl}
-            target="_blank"
-            rel="noreferrer"
-            className={styles.btnLink}
-          >
-            Apply
-          </a>
-        ),
-      })),
-    [jobs]
+  const handleShowMore = async () => {
+    const experienceText = experience !== "Any" ? `${experience} experience` : "";
+    const query = [role, "jobs", city ? `in ${city}` : "", experienceText]
+      .filter(Boolean)
+      .join(" ");
+    await fetchMoreJobs(query, currentPage + 1);
+  };
+
+  const cardTone = useMemo(
+    () => ["tonePeach", "toneMint", "toneLavender", "toneSky", "toneSand"],
+    []
   );
 
   return (
@@ -113,40 +165,15 @@ export default function ViewJobs() {
           />
         </div>
         <div className={styles.searchField}>
-          <label htmlFor="country">Country</label>
-          <select
-            id="country"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
+          <label htmlFor="city">City</label>
+          <input
+            id="city"
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="City name"
             className={styles.input}
-          >
-            {[
-              "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria",
-              "Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan",
-              "Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon",
-              "Canada","Cape Verde","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica",
-              "Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt",
-              "El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon",
-              "Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana",
-              "Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel",
-              "Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos",
-              "Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi",
-              "Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova",
-              "Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands",
-              "New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau",
-              "Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia",
-              "Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia",
-              "Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan",
-              "Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania",
-              "Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda",
-              "Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam",
-              "Yemen","Zambia","Zimbabwe"
-            ].map((countryName) => (
-              <option key={countryName} value={countryName}>
-                {countryName}
-              </option>
-            ))}
-          </select>
+          />
         </div>
         <div className={styles.searchField}>
           <label htmlFor="experience">Experience</label>
@@ -171,23 +198,67 @@ export default function ViewJobs() {
       {error ? (
         <p className={styles.jobInfo}>Error: {error}</p>
       ) : jobs.length === 0 ? (
-        <div className={styles.emptyState}>
+        <div className="emptyState">
           <Image
             src="/no-data.svg"
             alt="No jobs found"
             width={240}
             height={200}
-            className={styles.emptyStateImage}
+            className="emptyStateImage"
             sizes="20vw"
           />
           <h3>No jobs available</h3>
-          <p>Try changing the job role, country, or experience to find matches.</p>
+          <p>Try changing the job role, city, or experience to find matches.</p>
         </div>
       ) : (
         <>
-          <Table headers={headers} data={tableRows} enableStatusFilter={false} />
-          <div className={styles.jobInfo}>
-            <p>Total {jobs.length} Jobs, Showing 10 jobs per page</p>
+          <div className={styles.jobsHeader}>
+            <div className={styles.jobsTitle}>
+              <h3>Recommended jobs</h3>
+              <span className={styles.countPill}>{jobs.length}</span>
+            </div>
+            <span className={styles.totalText}>Total {jobs.length} jobs</span>
+          </div>
+          <div className={styles.cardGrid}>
+            {jobs.map((job, index) => (
+              <Link
+                key={job.id}
+                href={`/JobDetails/${encodeURIComponent(job.id)}`}
+                className={`${styles.card} ${styles[cardTone[index % cardTone.length]]}`}
+                style={{ animationDelay: `${index * 60}ms` }}
+              >
+                <div className={styles.cardHeader}>
+                  <span className={styles.postedAt}>
+                    {job.postedAt ? formatDate(job.postedAt) : "Not Defined"}
+                  </span>
+                  <span className={styles.status}>{job.status || "Open"}</span>
+                </div>
+                <div className={styles.cardBody}>
+                  <p className={styles.company}>{job.company || "Not Defined"}</p>
+                  <h4 className={styles.title}>{job.title || "Not Defined"}</h4>
+                  <p className={styles.location}>{job.location || "Not Defined"}</p>
+                  <div className={styles.tags}>
+                    <span className={styles.tag}>{job.platform || "Not Defined"}</span>
+                    <span className={styles.tag}>Full time</span>
+                    <span className={styles.tag}>On-site/Remote</span>
+                  </div>
+                </div>
+                <div className={styles.cardFooter}>
+                  <span className={styles.metaLabel}>View details</span>
+                  <span className={styles.detailsHint}>Click card</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className={styles.loadMoreRow}>
+            <button
+              type="button"
+              className={styles.showMoreBtn}
+              onClick={handleShowMore}
+              disabled={isLoadingMore}
+            >
+              {isLoadingMore ? "Loading..." : "Show More"}
+            </button>
           </div>
         </>
       )}

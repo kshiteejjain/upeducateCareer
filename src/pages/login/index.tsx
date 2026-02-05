@@ -41,7 +41,14 @@ export default function Login() {
 
         const result = (await response.json()) as {
           message?: string;
-          user?: { name?: string; role?: string; email?: string; userId?: string };
+          user?: {
+            name?: string;
+            role?: string;
+            email?: string;
+            userId?: string;
+            subject?: string;
+            resume?: Record<string, unknown>;
+          };
         };
 
         const authenticatedUser = {
@@ -49,6 +56,21 @@ export default function Login() {
           email: result.user?.email ?? email,
         };
         saveSession(authenticatedUser);
+        if (typeof window !== "undefined") {
+          try {
+            const payload = {
+              email: authenticatedUser?.email ?? email,
+              name: authenticatedUser?.name,
+              resume: authenticatedUser?.resume,
+              role: authenticatedUser?.role,
+              subject: authenticatedUser?.subject,
+              userId: authenticatedUser?.userId,
+            };
+            window.localStorage.setItem("userJobPrefix", JSON.stringify(payload));
+          } catch (err) {
+            console.warn("Failed to store user job profile", err);
+          }
+        }
 
         const name = authenticatedUser?.name ?? "";
         toast.success(

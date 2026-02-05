@@ -1,12 +1,22 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { clearSession } from "@/utils/authSession";
 import styles from "./Navbar.module.css";
+
+type StoredUser = {
+  email?: string;
+  name?: string;
+  resume?: Record<string, unknown>;
+  role?: string;
+  subject?: string;
+  userId?: string;
+};
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { pathname, push } = useRouter();
   const [pageTitle, setPageTitle] = useState("Dashboard");
+  const [storedUser, setStoredUser] = useState<StoredUser | null>(null);
 
   useEffect(() => {
     const segment = pathname.split("/").filter(Boolean).pop() || "";
@@ -22,6 +32,30 @@ export default function Navbar() {
     setPageTitle(title);
   }, [pathname]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem("userJobPrefix");
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as StoredUser;
+      setStoredUser(parsed ?? null);
+    } catch (err) {
+      console.warn("Failed to read stored user profile", err);
+    }
+  }, []);
+
+  const welcomeText = useMemo(() => {
+    const name = storedUser?.name?.trim();
+    if (!name) return "Welcome Back";
+    const initials = name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("");
+    return initials ? `Welcome Back, ${initials}` : "Welcome Back";
+  }, [storedUser?.name]);
+
   const goToProfile = () => {
     setOpen(false);
     push("/Profile");
@@ -32,6 +66,7 @@ export default function Navbar() {
       <h4 className={styles.pageTitle}>{pageTitle}</h4>
 
       <div className={styles.actions}>
+        <span className={styles.welcomeText}>{welcomeText}</span>
         <span title="Notifications" className={styles.icon}>
           &#128276;
         </span>
@@ -57,6 +92,9 @@ export default function Navbar() {
                 className={styles.menuRow}
                 onClick={() => {
                   clearSession();
+                  if (typeof window !== "undefined") {
+                    window.localStorage.removeItem("userJobPrefix");
+                  }
                   setOpen(false);
                   push("/login");
                 }}

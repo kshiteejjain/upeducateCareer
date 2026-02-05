@@ -55,64 +55,64 @@ type AiResumeResult = {
 const templates: ResumeTemplate[] = [
   {
     id: "navy",
-    name: "Richard Sanchez",
-    title: "Marketing Manager",
-    location: "123 Anywhere St, Any City",
-    email: "hello@reallygreatsite.com",
-    phone: "+123-456-7890",
+    name: "Kshiteej Jain",
+    title: "High School English Teacher",
+    location: "Austin, TX",
+    email: "kshitejjain@gmail.com",
+    phone: "+91 123-456-7890",
     photo:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
     summary:
-      "Experienced marketing manager skilled in brand strategy, multi-channel campaigns, and team leadership. Adept at driving growth through creative storytelling and datxinformed decisions.",
+      "Student-centered English teacher with 6+ years of experience designing engaging curriculum, improving literacy outcomes, and fostering inclusive classrooms. Skilled in differentiated instruction, data-informed lesson planning, and parent collaboration.",
     skills: [
-      { name: "Project Management", rating: 4 },
-      { name: "Public Relations", rating: 4 },
-      { name: "Teamwork", rating: 5 },
-      { name: "Time Management", rating: 4 },
-      { name: "Leadership", rating: 4 },
-      { name: "Effective Communication", rating: 5 },
-      { name: "Critical Thinking", rating: 4 },
+      { name: "Lesson Planning", rating: 5 },
+      { name: "Classroom Management", rating: 5 },
+      { name: "Differentiated Instruction", rating: 4 },
+      { name: "Assessment & Data Analysis", rating: 4 },
+      { name: "Curriculum Design", rating: 4 },
+      { name: "Parent Communication", rating: 5 },
+      { name: "EdTech Integration", rating: 4 },
     ],
-    languages: ["English (Fluent)", "French (Fluent)", "German (Basics)", "Spanish (Intermediate)"],
+    languages: ["English (Fluent)", "Hindi (Fluent)", "Spanish (Intermediate)"],
     experiences: [
       {
-        role: "Marketing Manager & Specialist",
-        company: "Borcelle Studio",
-        dates: "2030 - Present",
+        role: "English Teacher",
+        company: "Austin Independent School District",
+        dates: "2022 - Present",
         bullets: [
-          "Developed and executed comprehensive marketing strategies with a 20% lift in brand visibility.",
-          "Managed multi-channel campaigns across digital, social, and PR.",
-          "Mentored a high-performing team improving acquisition and retention.",
+          "Designed standards-aligned units for grades 9-11, improving writing proficiency by 18% on district benchmarks.",
+          "Implemented differentiated instruction and small-group interventions for diverse learning needs.",
+          "Partnered with families and counselors to support student growth and attendance.",
         ],
       },
       {
-        role: "Marketing Manager & Specialist",
-        company: "Fauget Studio",
-        dates: "2025 - 2029",
+        role: "English Teacher",
+        company: "Round Rock High School",
+        dates: "2019 - 2022",
         bullets: [
-          "Conducted market research to identify trends and optimize positioning.",
-          "Collaborated with internal and external stakeholders to deliver campaigns on schedule.",
+          "Led project-based learning units integrating research, presentation, and peer review.",
+          "Analyzed assessment data to target instruction and close literacy gaps.",
         ],
       },
       {
-        role: "Marketing Manager & Specialist",
-        company: "Studio Showde",
-        dates: "2024 - 2025",
+        role: "Student Teacher",
+        company: "Cedar Ridge High School",
+        dates: "2018 - 2019",
         bullets: [
-          "Maintained strong partner and vendor relationships to support marketing initiatives.",
+          "Co-taught 10th grade English and supported classroom routines and formative assessments.",
         ],
       },
     ],
     education: [
       {
-        school: "Wardiere University",
-        degree: "Master of Business Management",
-        dates: "2029 - 2030",
+        school: "The University of Texas at Austin",
+        degree: "M.Ed. in Curriculum & Instruction",
+        dates: "2019 - 2021",
       },
       {
-        school: "Wardiere University",
-        degree: "Bachelor of Business",
-        dates: "2025 - 2029",
+        school: "The University of Texas at Austin",
+        degree: "B.A. in English",
+        dates: "2015 - 2019",
       },
     ],
   },
@@ -349,7 +349,7 @@ export default function ResumeBuilder() {
     const isDocx =
       name.endsWith(".docx") ||
       file.type ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     const isDoc = name.endsWith(".doc") || file.type === "application/msword";
 
     if (!isPdf && !isDocx && !isDoc) {
@@ -390,7 +390,11 @@ export default function ResumeBuilder() {
         });
         const data = (await response.json()) as AiResumeResult & { message?: string };
         if (!response.ok) {
-          throw new Error(data?.message || "Failed to generate AI improvements.");
+          setUploadError(
+            data?.message ||
+            "AI review failed. Please try again or continue editing manually."
+          );
+          return;
         }
         setAiResult(data);
         if (data.parsedResume) {
@@ -399,19 +403,19 @@ export default function ResumeBuilder() {
             typeof skill === "string"
               ? { name: skill, rating: 3 }
               : {
-                  name: String(skill?.name ?? ""),
-                  rating: Math.max(1, Math.min(5, Number(skill?.rating ?? 3))),
-                }
+                name: String(skill?.name ?? ""),
+                rating: Math.max(1, Math.min(5, Number(skill?.rating ?? 3))),
+              }
           );
           setForm((prev) => ({
             ...prev,
             ...parsedResume,
+            photo: parsedResume.photo || prev.photo,
             skills: normalizedSkills,
             languages: parsedResume.languages || [],
             experiences: parsedResume.experiences || [],
             education: parsedResume.education || [],
           }));
-          setActiveTab("manual");
         }
       }, "Generating AI feedback...");
     } catch (error) {
@@ -677,13 +681,13 @@ export default function ResumeBuilder() {
             className={`${styles.tabButton} ${activeTab === "upload" ? styles.tabActive : ""}`}
             onClick={() => setActiveTab("upload")}
           >
-            Upload CV
+            🚀 Upload Resume
           </button>
           <button
             className={`${styles.tabButton} ${activeTab === "manual" ? styles.tabActive : ""}`}
             onClick={() => setActiveTab("manual")}
           >
-            Build Manually
+            ✏️ Build Manually
           </button>
         </div>
 
@@ -700,7 +704,7 @@ export default function ResumeBuilder() {
                   </p>
                   <div className={styles.uploadRow}>
                     <label className={styles.fileButton}>
-                      📄 Upload CV
+                      📄 Upload your resume here
                       <input
                         type="file"
                         accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -777,6 +781,15 @@ export default function ResumeBuilder() {
                         </div>
                       </div>
                     )}
+                    <div className={styles.aiBlock}>
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        onClick={() => setActiveTab("manual")}
+                      >
+                        Edit Resume
+                      </button>
+                    </div>
                   </div>
                 )}
               </>
@@ -791,70 +804,70 @@ export default function ResumeBuilder() {
                   <summary className={styles.accordionHeader}>Basic Info</summary>
                   <div className={styles.accordionBody}>
                     <div className={styles.formGrid}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Full Name</label>
-                <input
-                  className={`${styles.input}`}
-                  value={form.name}
-                  placeholder="Jane Doe"
-                  onChange={(e) => updateField("name", e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Title</label>
-                <input
-                  className={styles.input}
-                  value={form.title}
-                  placeholder="Product Manager"
-                  onChange={(e) => updateField("title", e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Location</label>
-                <input
-                  className={styles.input}
-                  value={form.location}
-                  placeholder="City, Country"
-                  onChange={(e) => updateField("location", e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Email</label>
-                <input
-                  className={styles.input}
-                  value={form.email}
-                  placeholder="you@example.com"
-                  onChange={(e) => updateField("email", e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Phone</label>
-                <input
-                  className={styles.input}
-                  value={form.phone}
-                  placeholder="+1 234 567 8901"
-                  onChange={(e) => updateField("phone", e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Photo URL (optional)</label>
-                <input
-                  className={styles.input}
-                  value={form.photo || ""}
-                  placeholder="https://example.com/photo.jpg"
-                  onChange={(e) => updateField("photo", e.target.value)}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  className={styles.fileInputSmall}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handlePhotoUpload(file);
-                  }}
-                />
-              </div>
-            </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Full Name</label>
+                        <input
+                          className={`${styles.input}`}
+                          value={form.name}
+                          placeholder="Jane Doe"
+                          onChange={(e) => updateField("name", e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Title</label>
+                        <input
+                          className={styles.input}
+                          value={form.title}
+                          placeholder="Product Manager"
+                          onChange={(e) => updateField("title", e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Location</label>
+                        <input
+                          className={styles.input}
+                          value={form.location}
+                          placeholder="City, Country"
+                          onChange={(e) => updateField("location", e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Email</label>
+                        <input
+                          className={styles.input}
+                          value={form.email}
+                          placeholder="you@example.com"
+                          onChange={(e) => updateField("email", e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Phone</label>
+                        <input
+                          className={styles.input}
+                          value={form.phone}
+                          placeholder="+1 234 567 8901"
+                          onChange={(e) => updateField("phone", e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Photo URL (optional)</label>
+                        <input
+                          className={styles.input}
+                          value={form.photo || ""}
+                          placeholder="https://example.com/photo.jpg"
+                          onChange={(e) => updateField("photo", e.target.value)}
+                        />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className={styles.fileInputSmall}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handlePhotoUpload(file);
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </details>
 
@@ -934,9 +947,6 @@ export default function ResumeBuilder() {
                   </div>
                 </details>
 
-            
-                <details className={styles.accordion}>
-                  
                 <details className={styles.accordion}>
                   <summary className={styles.accordionHeader}>Languages</summary>
                   <div className={styles.accordionBody}>
@@ -973,7 +983,8 @@ export default function ResumeBuilder() {
                   </div>
                 </details>
 
-<summary className={styles.accordionHeader}>Experience</summary>
+                <details className={styles.accordion}>
+                  <summary className={styles.accordionHeader}>Experience</summary>
                   <div className={styles.accordionBody}>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Experiences</label>
@@ -1082,39 +1093,44 @@ export default function ResumeBuilder() {
 
           <div className={`${styles.card} ${styles.previewCard} ${styles.printArea}`}>
             <div className={styles.previewHeader}>
-              <div>
-                <h3 className={styles.sectionTitle}>Preview</h3>
-                <p className={styles.previewSub}>Choose a resume template style</p>
-              </div>
+              <h3 className={styles.sectionTitle}>Preview</h3>
               <div className={styles.previewActions}>
-                <select
-                  className={styles.templateSelect}
-                  value={previewTemplate}
-                  onChange={(e) =>
-                    setPreviewTemplate(e.target.value as "navy" | "clean" | "slate")
-                  }
-                >
-                  <option value="navy">Classic Navy</option>
-                  <option value="clean">Classic Clean</option>
-                  <option value="slate">Classic Slate</option>
-                </select>
+                <div className={styles.templateOptions}>
+                  {[
+                    { id: "navy", label: "🎓 Educator Classic" },
+                    { id: "clean", label: "📄 Minimal White" },
+                    { id: "slate", label: "🧊 Modern Slate" },
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={`${styles.templateOption} ${previewTemplate === option.id ? styles.templateOptionActive : ""
+                        }`}
+                      onClick={() =>
+                        setPreviewTemplate(option.id as "navy" | "clean" | "slate")
+                      }
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
             {previewTemplate === "navy"
               ? renderNavyTemplate()
               : previewTemplate === "clean"
-              ? renderCleanTemplate()
-              : renderSlateTemplate()}
-              
-              <button
-                type="button"
-                className={`btn-primary ${styles.downloadResume}`}
-                title="Save and Download PDF"
-                onClick={saveDownloadResume}
-              >
-                  Save and Download
-                </button>
+                ? renderCleanTemplate()
+                : renderSlateTemplate()}
+
+            <button
+              type="button"
+              className={`btn-primary ${styles.downloadResume}`}
+              title="Save and Download PDF"
+              onClick={saveDownloadResume}
+            >
+              Save and Download
+            </button>
           </div>
         </div>
       </>

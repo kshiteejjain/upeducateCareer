@@ -51,6 +51,7 @@
 .messages {
   padding: 24px;
   max-height: 60vh;
+  min-height: 50vh;
   overflow-y: auto;
   background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
 }

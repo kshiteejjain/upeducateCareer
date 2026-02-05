@@ -42,11 +42,18 @@ type AnalysisResult = {
       skills?: string[];
     };
     suggestedKeywords: string[];
+    targetRoleInsights?: {
+      roleSummary?: string;
+      growth?: string;
+      marketValue?: string;
+      jobInsights?: string[];
+    };
   };
 };
 
 export default function LinkedinAnalysis() {
   const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [targetRole, setTargetRole] = useState("");
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -58,6 +65,10 @@ export default function LinkedinAnalysis() {
 
     if (!linkedinUrl.trim()) {
       setError("Please enter a valid LinkedIn profile URL");
+      return;
+    }
+    if (!targetRole.trim()) {
+      setError("Please enter a target role");
       return;
     }
 
@@ -85,6 +96,7 @@ export default function LinkedinAnalysis() {
           body: JSON.stringify({
             profileData: (baseData as AnalysisResult).profileData,
             sections: (baseData as AnalysisResult).sections,
+            targetRole,
           }),
         });
         const aiData = (await aiResponse.json()) as {
@@ -99,6 +111,12 @@ export default function LinkedinAnalysis() {
             skills?: string[];
           };
           suggestedKeywords?: string[];
+          targetRoleInsights?: {
+            roleSummary?: string;
+            growth?: string;
+            marketValue?: string;
+            jobInsights?: string[];
+          };
         };
         if (!aiResponse.ok) {
           throw new Error(aiData?.message || "Failed to analyze profile with AI.");
@@ -113,6 +131,12 @@ export default function LinkedinAnalysis() {
             recommendations: aiData.recommendations ?? [],
             modifications: aiData.modifications ?? {},
             suggestedKeywords: aiData.suggestedKeywords ?? [],
+            targetRoleInsights: aiData.targetRoleInsights ?? {
+              roleSummary: "",
+              growth: "",
+              marketValue: "",
+              jobInsights: [],
+            },
           },
         });
       } catch (err) {
@@ -163,10 +187,25 @@ export default function LinkedinAnalysis() {
                 className={styles.input}
                 disabled={isLoading}
               />
-              <p className={styles.hint}>Example: https://www.linkedin.com/in/williamgates/</p>
+              <p className={styles.hint}>Example: https://www.linkedin.com/in/kshiteejjain/</p>
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="targetRole" className={styles.label}>
+                Target Role
+              </label>
+              <input
+                id="targetRole"
+                type="text"
+                value={targetRole}
+                onChange={(e) => setTargetRole(e.target.value)}
+                placeholder="e.g., Maths Teacher"
+                className={styles.input}
+                disabled={isLoading}
+              />
+              <p className={styles.hint}>Example: Role you are looking for</p>
             </div>
 
-            <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+            <button type="submit" className="btn-primary" disabled={isLoading}>
               {isLoading ? "Analyzing..." : "Analyze Profile"}
             </button>
           </form>
@@ -189,13 +228,12 @@ export default function LinkedinAnalysis() {
                     style={{ color: getScoreColor(analysisResult.profileScore) }}
                   >
                     {analysisResult.profileScore}
-                    {analysisResult.profileScore > 50 && " ❤️"}
                   </span>
                   <span className={styles.scoreMax}>/100</span>
                 </div>
                 <div className={styles.scoreInfo}>
                   <h2 style={{ color: getScoreColor(analysisResult.profileScore) }}>
-                    {getScoreMessage(analysisResult.profileScore)}
+                    {analysisResult.profileScore > 50 && " ❤️"} {getScoreMessage(analysisResult.profileScore)}
                   </h2>
                   <p className={styles.scoreDescription}>
                     Your profile demonstrates strong technical expertise, but focused improvements can significantly enhance your impact and searchability.
@@ -359,6 +397,41 @@ export default function LinkedinAnalysis() {
                     </div>
                   </div>
                 )}
+
+                {(analysisResult.aiAnalysis.targetRoleInsights?.roleSummary ||
+                  analysisResult.aiAnalysis.targetRoleInsights?.growth ||
+                  analysisResult.aiAnalysis.targetRoleInsights?.marketValue ||
+                  analysisResult.aiAnalysis.targetRoleInsights?.jobInsights?.length) && (
+                  <div className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>Target Role Insights</span>
+                    {analysisResult.aiAnalysis.targetRoleInsights?.roleSummary && (
+                      <p className={styles.cardText}>
+                        {analysisResult.aiAnalysis.targetRoleInsights.roleSummary}
+                      </p>
+                    )}
+                    {analysisResult.aiAnalysis.targetRoleInsights?.growth && (
+                      <p className={styles.cardText}>
+                        <strong>Growth:</strong>{" "}
+                        {analysisResult.aiAnalysis.targetRoleInsights.growth}
+                      </p>
+                    )}
+                    {analysisResult.aiAnalysis.targetRoleInsights?.marketValue && (
+                      <p className={styles.cardText}>
+                        <strong>Market Value:</strong>{" "}
+                        {analysisResult.aiAnalysis.targetRoleInsights.marketValue}
+                      </p>
+                    )}
+                    {!!analysisResult.aiAnalysis.targetRoleInsights?.jobInsights?.length && (
+                      <ul className={styles.cardList}>
+                        {analysisResult.aiAnalysis.targetRoleInsights.jobInsights.map(
+                          (item, idx) => (
+                            <li key={idx}>{item}</li>
+                          )
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -399,6 +472,7 @@ export default function LinkedinAnalysis() {
                 onClick={() => {
                   setAnalysisResult(null);
                   setLinkedinUrl("");
+                  setTargetRole("");
                 }}
                 className={styles.analyzeAnotherBtn}
               >
